@@ -10,7 +10,7 @@ paulatim nostros ad sensus, ut moveantur
 illa quoque, in solis quae lumine cernere quimus
 nec quibus id faciant plagis apparet aperte.
 
-## Installation instructions:
+## Installation Instruction:
 
 Save the MATLAB package somewhere on your computer, then add it
 to your MATLAB path. You can do this in the MATLAB "Current Folder"
@@ -27,6 +27,8 @@ they require.
 **`AccuSleep_GUI`** provides a convenient interface with all of the functions
 you need, but if you want to batch process many recordings, you can
 call the required functions yourself.
+
+## Functions
 
 - **`AccuSleep_GUI`**. A user interface for labeling sleep states, either
     manually or automatically
