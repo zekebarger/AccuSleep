@@ -39,5 +39,5 @@ call the required functions yourself.
     recording equipment
 
 ## Requirements:
--MATLAB version XX or later
+- MATLAB version XX or later
 - Machine Learning Toolbox
