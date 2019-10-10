@@ -33,7 +33,7 @@ call the required functions yourself.
 - **`AccuSleep_viewer`**. A user interface for manually labeling sleep states
 - **`AccuSleep_classify`**. Automatically labels sleep states using a
     pre-trained neural network
-- **`AccuSleep_train`**. Trains a neural network for this purpose
+- **`AccuSleep_train`**. Trains a neural network for labeling sleep states
 - **`createCalibrationData`**. Generates a file that is required for automatic
     sleep state labeling for a given combination of subject and
     recording equipment
