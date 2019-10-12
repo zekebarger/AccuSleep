@@ -2,15 +2,10 @@
 
 ## DESCRIPTION
 
-Dulce et decorum est pro patria mori.
-Nihil novum sub solem.
-Quis custodiet ipsos custodes?
-Sic a principiis ascendit motus et exit
-paulatim nostros ad sensus, ut moveantur
-illa quoque, in solis quae lumine cernere quimus
-nec quibus id faciant plagis apparet aperte.
+AccuSleep is a set of graphical user interfaces for scoring rodent
+sleep using EEG and EMG recordings.
 
-## Installation Instruction:
+## Installation instructions:
 
 Save the MATLAB package somewhere on your computer, then add it
 to your MATLAB path. You can do this in the MATLAB "Current Folder"
@@ -41,5 +36,5 @@ call the required functions yourself.
     recording equipment
 
 ## Requirements:
-- MATLAB version XX or later
-- Machine Learning Toolbox
+- MATLAB version 2016b or later
+- Statistics and Machine Learning Toolbox
