@@ -20,6 +20,10 @@ function [net] = AccuSleep_train(fileList, SR, epochLen, epochs, imageLocation)
 %   Output:
 %   net - a trained network (SeriesNetwork object) that can be used by
 %   AccuSleep_GUI or AccuSleep_classify for classification.
+%   Note - Unfortunately, it seems that networks trained using MATLAB 
+%   2019a or later are not readable by versions 2018b or earlier. 
+%   However, networks trained using MATLAB 2018b or earlier seem to be 
+%   forward compatible.
 
 
 %% Check the inputs and prepare the image folder
