@@ -130,7 +130,7 @@ function AccuSleep_instructions
 % in step 3 of Section 4C. Unfortunately, it seems that networks 
 % trained using MATLAB 2019a or later are not readable by versions
 % 2018b or earlier. However, networks trained using MATLAB 2018b or
-% earlier seem to forward compatible.
+% earlier seem to be forward compatible.
 % 
 % 
 % Section 4C: Automatic labeling
