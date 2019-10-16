@@ -122,7 +122,7 @@ function AccuSleep_instructions
 % Section 4B: Creating a trained network file
 % 
 % Pre-trained neural networks are provided with AccuSleep for epoch 
-% lengths of 2.5, 4, and 5 seconds. If you wish to train your own 
+% lengths of 2.5, 4, 5, and 10 seconds. If you wish to train your own 
 % network, see AccuSleep_train.m for details. You will need to create a 
 % cell array containing filenames of EEG, EMG, and label files in the 
 % training set. AccuSleep_train produces a SeriesNetwork object. Name 
