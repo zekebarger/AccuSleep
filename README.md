@@ -1,11 +1,11 @@
 # AccuSleep
 
-## DESCRIPTION
+## Description
 
 AccuSleep is a set of graphical user interfaces for scoring rodent
 sleep using EEG and EMG recordings.
 
-## Installation instructions:
+## Installation instructions
 
 Save the MATLAB package somewhere on your computer, then add it
 to your MATLAB path. You can do this in the MATLAB "Current Folder"
@@ -23,7 +23,7 @@ they require.
 you need, but if you want to batch process many recordings, you can
 call the required functions yourself.
 
-## Functions:
+## Functions
 
 - **`AccuSleep_GUI`**. A user interface for labeling sleep states, either
     manually or automatically
@@ -35,13 +35,13 @@ call the required functions yourself.
     sleep state labeling for a given combination of subject and
     recording equipment
 
-## Requirements:
+## Requirements
 - MATLAB version 2016b or later
 - Statistics and Machine Learning Toolbox
 
 ## Screenshots
 ![alt test](https://i.imgur.com/kPnJIvc.png)
-Primary interface
+Primary interface (AccuSleep_GUI)
 
 ![alt test](https://i.imgur.com/hFZXLev.png)
-Interface for manual sleep scoring
+Interface for manual sleep scoring (AccuSleep_viewer)
