@@ -11,8 +11,9 @@ function [net] = AccuSleep_train(fileList, SR, epochLen, epochs, imageLocation)
 %   epochLen - length of each scoring epoch, in seconds
 %   epochs - the number of epochs for the network to consider at once when
 %       scoring each individual epoch. More epochs provide more context,
-%       but using fewer epochs is more efficient. ***Must be an odd #***
-%       For 2.5s epochs, the a reasonable value is 13.
+%       but using fewer epochs is more efficient.
+%       ***Must be an odd number greater than or equal to 9***
+%       For 2.5s epochs, a reasonable value is 13.
 %   imageLocation (optional) - training images will be stored here. If
 %       no location is specified, a temporary folder will be created in the
 %       current directory and deleted after the network is trained.   
@@ -225,7 +226,10 @@ layers = [
 
 % train
 disp('Training network')
-[net, ~] = trainNetwork(imdsTrain,layers,options);
+[net, trainInfo] = trainNetwork(imdsTrain,layers,options);
+
+disp('Training complete: Final validation accuracy:')
+disp([trainInfo.ValidationAccuracy(end),'%'])
 
 % delete the images
 if deleteImages
