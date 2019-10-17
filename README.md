@@ -23,6 +23,9 @@ they require.
 you need, but if you want to batch process many recordings, you can
 call the required functions yourself.
 
+To download the data used for training and testing AccuSleep, please visit
+https://osf.io/py5eb/
+
 ## Functions
 
 - **`AccuSleep_GUI`**. A user interface for labeling sleep states, either
