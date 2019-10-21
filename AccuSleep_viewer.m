@@ -1,6 +1,7 @@
 function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepath)
 %AccuSleep_viewer A GUI for manually assigning sleep stage labels to EEG/EMG data.
-%   Zeke Barger 101419
+%   Zeke Barger. 10/14/19. 
+%   An early version of this interface was created by Franz Weber.
 %   Arguments:
 %   EEG: the EEG signal as a vector
 %   EMG: the EMG signal as a vector
