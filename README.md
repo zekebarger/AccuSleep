@@ -48,3 +48,6 @@ Primary interface (AccuSleep_GUI)
 
 ![alt test](https://i.imgur.com/hFZXLev.png)
 Interface for manual sleep scoring (AccuSleep_viewer)
+
+## Acknowledgements
+We would like to thank Franz Weber for creating an early version of the manual labeling interface.
