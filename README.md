@@ -20,8 +20,8 @@ To get started, run `AccuSleep_GUI` and click the Help button, or run
 for a full explanation of these functions and the types of input
 they require.
 
-**`AccuSleep_GUI`** provides a convenient interface with all of the functions
-you need, but if you want to batch process many recordings, you can
+**`AccuSleep_GUI`** provides an interface for most of the functions
+in this package, but if you want to batch process many recordings, you can
 call the required functions yourself.
 
 To download the data used for training and testing AccuSleep, please visit
