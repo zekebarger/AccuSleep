@@ -3,8 +3,10 @@
 ## Description
 
 AccuSleep is a set of graphical user interfaces for scoring rodent
-sleep using EEG and EMG recordings. If you have any questions
-about the software, please contact zeke AT berkeley DOT edu.
+sleep using EEG and EMG recordings. To learn more about the algorithms used
+by this software, please see our preprint at https://www.biorxiv.org/content/10.1101/813345v2
+
+If you have any questions about the software, please contact zeke (at) berkeley (dot) edu.
 
 ## Installation instructions
 
