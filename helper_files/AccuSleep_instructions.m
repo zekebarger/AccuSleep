@@ -121,13 +121,13 @@ function AccuSleep_instructions
 % 
 % Section 4B: Creating a trained network file
 % 
-% Pre-trained neural networks are provided with AccuSleep for epoch 
-% lengths of 2.5, 4, 5, and 10 seconds. If you wish to train your own 
-% network, see AccuSleep_train.m for details. You will need to create a 
-% cell array containing filenames of EEG, EMG, and label files in the 
-% training set. AccuSleep_train produces a SeriesNetwork object. Name 
-% this variable ‘net’ and save it in a .mat file. You can then load it 
-% in step 3 of Section 4C. Unfortunately, it seems that networks 
+% Pre-trained neural networks are located in the trainedNetworks folder 
+% with epoch lengths of 2.5, 4, 5, and 10 seconds. If you wish to train 
+% your own network, see AccuSleep_train.m for details. You will need to 
+% create a cell array containing filenames of EEG, EMG, and label files 
+% in the training set. AccuSleep_train produces a SeriesNetwork object. 
+% Name this variable ‘net’ and save it in a .mat file. You can then load 
+% it in step 3 of Section 4C. Unfortunately, it seems that networks 
 % trained using MATLAB 2019a or later are not readable by versions
 % 2018b or earlier. However, networks trained using MATLAB 2018b or
 % earlier seem to be forward compatible.
