@@ -485,12 +485,12 @@ if str2num(get(handles.srBox,'String')) <= 0 || str2num(get(handles.tsBox,'Strin
 end
 if mode == 1 % automatic rather than manual
     if isempty(handles.calibTxt.String)
-        nimateBoxes(getappdata(handles.runBtn,'calibIndicators'),0);
+        animateBoxes(getappdata(handles.runBtn,'calibIndicators'),0);
         disptext(handles, 'ERROR: Please select or create a calibration data file');
         return
     end
     if isempty(handles.netTxt.String)
-        nimateBoxes(getappdata(handles.runBtn,'netIndicators'),0);
+        animateBoxes(getappdata(handles.runBtn,'netIndicators'),0);
         disptext(handles, 'ERROR: Please select a trained network file');
         return
     end
