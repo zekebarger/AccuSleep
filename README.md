@@ -1,5 +1,11 @@
 # AccuSleep
 
+## Updates
+**10/30/2019** - The primary user interface has received a major update, and now
+    allows all recordings from one subject to be processed simultaneously. A 
+    small bug was also fixed, the user manual was updated, and error messages 
+    should be more helpful. **Please replace any older versions of AccuSleep with this one.**
+
 ## Description
 
 AccuSleep is a set of graphical user interfaces for scoring rodent
@@ -23,7 +29,7 @@ for a full explanation of these functions and the types of input
 they require.
 
 **`AccuSleep_GUI`** provides an interface for most of the functions
-in this package, but if you want to batch process many recordings, you can
+in this package, but if you want to batch process recordings from multiple subjects, you can
 call the required functions yourself.
 
 To download the data used for training and testing AccuSleep, please visit
@@ -58,7 +64,7 @@ https://osf.io/py5eb/
   this software.
 
 ## Screenshots
-![alt test](https://i.imgur.com/kPnJIvc.png)
+![alt test](https://i.imgur.com/zeoqlfP.png)
 Primary interface (AccuSleep_GUI)
 
 ![alt test](https://i.imgur.com/hFZXLev.png)
