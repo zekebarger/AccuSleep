@@ -1,9 +1,8 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger 100119
-% To see the user manual, run this code and press the Help button, or run:
+% Zeke Barger 103019
+% To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
-
 
 % Begin initialization code - do not edit
 gui_Singleton = 1;
@@ -31,142 +30,194 @@ function AccuSleep_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
+
+% store data in various parts of the GUI
 % console text
 setappdata(handles.console,'text',{});
 setappdata(handles.console,'line',1);
-% store some data in the button object
-% EEG data
-setappdata(handles.runBtn,'EEG',[]);
-setappdata(handles.runBtn,'EEGlen',[]);
-% EMG data
-setappdata(handles.runBtn,'EMG',[]);
-setappdata(handles.runBtn,'EMGlen',[]);
+
+% store most data in an invisible text box called "D"
+% hey, it works
+% list box information
+setappdata(handles.D,'recList',{'Recording 1'}); % the list itself
+setappdata(handles.D,'recCountMax',1); % how many items have ever been in the list
+% data for each recording
+setappdata(handles.D,'recordings',{makeRecordingObject()});
 % calibration data
-setappdata(handles.runBtn,'calibrationData',[]);
+setappdata(handles.D,'calibrationData',[]);
 % trained network
-setappdata(handles.runBtn,'net',[]);
-% indicator handles
-allIndicators = {[handles.eeg1, handles.eeg2, handles.eeg3, handles.eeg4],...
+setappdata(handles.D,'net',[]);
+% indicator handles - this lets us animate the indicators easily
+allIndicators = {[handles.sr1, handles.sr2, handles.sr3, handles.sr4],...
+    [handles.ts1, handles.ts2, handles.ts3, handles.ts4],...
+    [handles.eeg1, handles.eeg2, handles.eeg3, handles.eeg4],...
     [handles.emg1, handles.emg2, handles.emg3, handles.emg4],...
     [handles.output1, handles.output2, handles.output3, handles.output4],...
-    [handles.sr1, handles.sr2, handles.sr3, handles.sr4],...
-    [handles.ts1, handles.ts2, handles.ts3, handles.ts4],...
     [handles.calib1, handles.calib2],...
     [handles.net1, handles.net2]};
-setappdata(handles.runBtn,'eegIndicators',allIndicators{1});
-setappdata(handles.runBtn,'emgIndicators',allIndicators{2});
-setappdata(handles.runBtn,'outputIndicators',allIndicators{3});
-setappdata(handles.runBtn,'srIndicators',allIndicators{4});
-setappdata(handles.runBtn,'tsIndicators',allIndicators{5});
-setappdata(handles.runBtn,'calibIndicators',allIndicators{6});
-setappdata(handles.runBtn,'netIndicators',allIndicators{7});
-setappdata(handles.runBtn,'allIndicators',allIndicators);
+setappdata(handles.D,'srIndicators',allIndicators{1});
+setappdata(handles.D,'tsIndicators',allIndicators{2});
+setappdata(handles.D,'eegIndicators',allIndicators{3});
+setappdata(handles.D,'emgIndicators',allIndicators{4});
+setappdata(handles.D,'outputIndicators',allIndicators{5});
+setappdata(handles.D,'calibIndicators',allIndicators{6});
+setappdata(handles.D,'netIndicators',allIndicators{7});
+setappdata(handles.D,'allIndicators',allIndicators);
+% set the default appearance of the indicators
 for i = 1:length(allIndicators)
     setIndicator(allIndicators{i}, 'failure')
     for j = 1:length(allIndicators{i})
-        %         set(allIndicators{i}(j),'BackgroundColor',[.93 .93 .93]);
         set(allIndicators{i}(j),'BackgroundColor',[1 1 1]);
     end
 end
+
+% display a logo, of sorts
+text(handles.axes1,.51,.496,'AccuSleep','FontSize',43,'Rotation',90,'Color',[.68 .87 .71],...
+    'HorizontalAlignment','center')
+text(handles.axes1,.49,.504,'AccuSleep','FontSize',43,'Rotation',90,'Color',[.17 .26 .62],...
+    'HorizontalAlignment','center')
 
 % --- Outputs from this function are returned to the command line.
 function varargout = AccuSleep_GUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
-
-function eegBtn_Callback(hObject, eventdata, handles) % loads EEG data
-% choose default string
-currentEEG = get(handles.eegTxt,'String');
-currentEMG = get(handles.emgTxt,'String');
-if isempty(currentEEG) && ~isempty(currentEMG)
-    default = getDir(currentEMG);
+% loads EEG data
+function eegBtn_Callback(hObject, eventdata, handles) 
+% choose default location to look for EEG file
+currentEEGpath = get(handles.eegTxt,'String');
+currentEMGpath = get(handles.emgTxt,'String');
+if isempty(currentEEGpath) && ~isempty(currentEMGpath)
+    default = getDir(currentEMGpath);
 else
-    default = currentEEG;
+    default = currentEEGpath;
 end
 [file,path] = uigetfile('*.mat','Select .mat file containing "EEG" variable',...
     default); % get user input
-if ischar(file) % if something was selected
-    disptext(handles, 'Loading EEG...');
-    set(handles.eegTxt,'String','');
-    setappdata(handles.runBtn,'EEG',[]);
-    setIndicator(getappdata(handles.runBtn,'eegIndicators'), 'working')
-    drawnow;
-    d = load([path,file]); % load the data
-    if isfield(d,'EEG')
-        % check that it's the right shape
-        if (length(size(d.EEG))>2 || min(size(d.EEG))>1) || (isempty(d.EEG) || ~isnumeric(d.EEG))
-            disptext(handles, 'ERROR: EEG variable must be a numeric vector');
-            setIndicator(getappdata(handles.runBtn,'eegIndicators'), 'failure')
-            return
-        end
-        setappdata(handles.runBtn,'EEG',d.EEG); % store the data
-        setappdata(handles.runBtn,'EEGlen',length(d.EEG));
-        set(handles.eegTxt,'String',[path,file]); % store filename in the text box
-        disptext(handles, 'EEG file selected');
-        setIndicator(getappdata(handles.runBtn,'eegIndicators'), 'success')
-        % check if EEG/EMG are the same length
-        if ~isempty(get(handles.emgTxt,'String'))
-            if getappdata(handles.runBtn,'EEGlen') ~= getappdata(handles.runBtn,'EMGlen')
-                setIndicator([getappdata(handles.runBtn,'eegIndicators'),...
-                    getappdata(handles.runBtn,'emgIndicators')], 'serious_warn')
-                disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
-            else
-                setIndicator([getappdata(handles.runBtn,'eegIndicators'),...
-                    getappdata(handles.runBtn,'emgIndicators')], 'success')
-            end
-        end
-    else
-        disptext(handles, 'ERROR: File must contain a variable named EEG');
-        setIndicator(getappdata(handles.runBtn,'eegIndicators'), 'failure')
-    end
+if ~ischar(file) % if nothing was selected, return
+    return
 end
 
+setListLock(handles,1); % lock list so that inputs don't change while this runs
 
-function emgBtn_Callback(hObject, eventdata, handles) % loads EMG data
-currentEEG = get(handles.eegTxt,'String');
-currentEMG = get(handles.emgTxt,'String');
-if isempty(currentEMG) && ~isempty(currentEEG)
-    default = getDir(currentEEG);
+idx = handles.recbox.Value; % get index of currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+rec = allRecordings{idx}; % just get contents of selected recording
+
+disptext(handles, 'Loading EEG...'); % show a helpful message
+set(handles.eegTxt,'String',''); % clear the stored EEG-related data
+rec.EEG = [];
+rec.EEGpath = '';
+setIndicator(getappdata(handles.D,'eegIndicators'), 'working')
+drawnow;
+
+d = load([path,file]); % load the data
+if isfield(d,'EEG')
+    % check that it's the right shape
+    if (length(size(d.EEG))>2 || min(size(d.EEG))>1) || (isempty(d.EEG) || ~isnumeric(d.EEG))
+        disptext(handles, 'ERROR: EEG variable must be a numeric 1D matrix');
+        % update the recording's information
+        rec.indicators{1} = 'failure';
+        allRecordings{idx}=rec;
+        setappdata(handles.D,'recordings',allRecordings);
+        setListLock(handles,0); % unlock the list box
+        updateDisplay(handles); % update the display
+        return
+    end
+    % store the data
+    rec.EEG = d.EEG;
+    rec.EEGlen = length(d.EEG);
+    rec.EEGpath = [path,file];
+    rec.indicators{1} = 'success';
+    
+    disptext(handles, 'EEG file selected');
+    % check if EEG/EMG are the same length
+    if ~isempty(get(handles.emgTxt,'String')) % if EMG data has been loaded
+        if getappdata(handles.D,'EEGlen') ~= getappdata(handles.D,'EMGlen')
+            rec.indicators{1} = 'serious_warn';
+            rec.indicators{2} = 'serious_warn';
+            disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
+        else
+            rec.indicators{1} = 'success';
+            rec.indicators{2} = 'success';
+        end
+    end
 else
-    default = currentEMG;
+    disptext(handles, 'ERROR: File must contain a variable named EEG');
+    rec.indicators{1} = 'failure';
+end
+allRecordings{idx}=rec; % store new EEG data
+setappdata(handles.D,'recordings',allRecordings);
+setListLock(handles,0); % unlock the list
+updateDisplay(handles); % update the display
+
+% loads EMG data
+function emgBtn_Callback(hObject, eventdata, handles) 
+currentEEGpath = get(handles.eegTxt,'String');
+currentEMGpath = get(handles.emgTxt,'String');
+if isempty(currentEMGpath) && ~isempty(currentEEGpath)
+    default = getDir(currentEEGpath);
+else
+    default = currentEMGpath;
 end
 [file,path] = uigetfile('*.mat','Select .mat file containing "EMG" variable',...
     default);
-if ischar(file)
-    disptext(handles, 'Loading EMG...');
-    set(handles.emgTxt,'String','');
-    setappdata(handles.runBtn,'EMG',[]);
-    setIndicator(getappdata(handles.runBtn,'emgIndicators'), 'working')
-    drawnow;
-    d = load([path,file]);
-    if isfield(d,'EMG')
-        if (length(size(d.EMG))>2 || min(size(d.EMG))>1) || (isempty(d.EMG) || ~isnumeric(d.EMG))
-            disptext(handles, 'ERROR: EMG variable must be a numeric vector');
-            setIndicator(getappdata(handles.runBtn,'emgIndicators'), 'failure')
-            return
-        end
-        setappdata(handles.runBtn,'EMG',d.EMG);
-        setappdata(handles.runBtn,'EMGlen',length(d.EMG));
-        set(handles.emgTxt,'String',[path,file]);
-        disptext(handles, 'EMG file selected');
-        setIndicator(getappdata(handles.runBtn,'emgIndicators'), 'success')
-        if ~isempty(get(handles.eegTxt,'String'))
-            if getappdata(handles.runBtn,'EEGlen') ~= getappdata(handles.runBtn,'EMGlen')
-                setIndicator([getappdata(handles.runBtn,'eegIndicators'),...
-                    getappdata(handles.runBtn,'emgIndicators')], 'serious_warn')
-                disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
-            else
-                setIndicator([getappdata(handles.runBtn,'eegIndicators'),...
-                    getappdata(handles.runBtn,'emgIndicators')], 'success')
-            end
-        end
-    else
-        disptext(handles, 'ERROR: File must contain a variable named EMG');
-        setIndicator(getappdata(handles.runBtn,'emgIndicators'), 'failure')
-    end
+if ~ischar(file)
+    return
 end
 
+setListLock(handles,1); % lock list
+idx = handles.recbox.Value; % get currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+rec = allRecordings{idx}; % just get info for current recording
+
+disptext(handles, 'Loading EMG...');
+set(handles.emgTxt,'String','');
+rec.EMG = [];
+rec.EMGpath = '';
+setIndicator(getappdata(handles.D,'emgIndicators'), 'working')
+drawnow;
+
+d = load([path,file]);
+if isfield(d,'EMG')
+    % check that it's the right shape
+    if (length(size(d.EMG))>2 || min(size(d.EMG))>1) || (isempty(d.EMG) || ~isnumeric(d.EMG))
+        disptext(handles, 'ERROR: EMG variable must be a numeric 1D matrix');
+        % update the recording's information
+        rec.indicators{2} = 'failure';
+        allRecordings{idx}=rec;
+        setappdata(handles.D,'recordings',allRecordings);
+        setListLock(handles,0); % unlock the list box
+        updateDisplay(handles); % update the display
+        return
+    end
+    % store the data
+    rec.EMG = d.EMG;
+    rec.EMGlen = length(d.EMG);
+    rec.EMGpath = [path,file];
+    rec.indicators{2} = 'success';
+    
+    disptext(handles, 'EMG file selected');
+    if ~isempty(get(handles.eegTxt,'String'))
+        if getappdata(handles.D,'EEGlen') ~= getappdata(handles.D,'EMGlen')
+            rec.indicators{1} = 'serious_warn';
+            rec.indicators{2} = 'serious_warn';
+            disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
+        else
+            rec.indicators{1} = 'success';
+            rec.indicators{2} = 'success';
+        end
+    end
+else
+    disptext(handles, 'ERROR: File must contain a variable named EMG');
+    rec.indicators{2} = 'failure';
+end
+allRecordings{idx}=rec;
+setappdata(handles.D,'recordings',allRecordings);
+setListLock(handles,0);
+updateDisplay(handles); % update the display
+
 function outputBtn_Callback(hObject, eventdata, handles) % sets location of output file
+% find default folder in which to look for a labels file
 if ~isempty(get(handles.outputTxt,'String'))
     default = getDir(get(handles.outputTxt,'String'));
 else
@@ -181,172 +232,217 @@ else
     end
 end
 
+% get file
 [file,path] = uiputfile('*.mat',...
-    'Enter new filename for saving sleep stage labels, or select existing file',...
+    ['Enter new filename for saving sleep stage labels, or select existing file',...
+    ' (IGNORE the message about replacement)'],...
     default); % get user input
-if ischar(file) % user gave some input
-    set(handles.outputTxt,'String',[path,file]); % store the input
-    % set all indicators except for creating a calibrationData file to green
-    ind = getappdata(handles.runBtn,'outputIndicators');
-    setIndicator(ind([1,2,4]), 'success')
-    setIndicator(ind(3), 'unknown')
-    % try to load the file
-    if isfile(get(handles.outputTxt,'String')) % if the file exists
-        d = load(get(handles.outputTxt,'String')); % load it
-        if isfield(d,'labels') % if it has a field called labels
-            disptext(handles,'Label file found');
-        else
-            if isempty(fieldnames(d)) % if file is just empty
-                disptext(handles, 'Name for label file has been set');
-            else % file has some other contents that could be overwritten
-                setIndicator(getappdata(handles.runBtn,'outputIndicators'),'serious_warn');
-                disptext(handles,...
-                    'WARNING: label file has other (non-label) contents that will be overwritten.');
-                disptext(handles,...
-                    '         See the user manual for instructions on formatting the label file.');
-            end
-        end
-    else
-        disptext(handles, 'Output filename set');
-    end
-end
-
-% --- Executes on button press in manualBtn.
-function manualBtn_Callback(hObject, eventdata, handles)
-% make sure we have the files we need
-if checkMissingEntries(handles, 0)
+if ~ischar(file) % user did not give input
     return
 end
 
-% check if a label file already exists, and load those labels if possible
-labels = [];
+setListLock(handles,1); % lock the list box
+
+idx = handles.recbox.Value; % get currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+rec = allRecordings{idx}; % just get info for current recording
+
+rec.labelpath = [path,file]; % store the input
+rec.indicators{3} = 'success';
+
+% try to load the file
 if isfile(get(handles.outputTxt,'String')) % if the file exists
     d = load(get(handles.outputTxt,'String')); % load it
+    if isfield(d,'labels') % if it has a field called labels
+        disptext(handles,'Label file found');
+    else
+        if isempty(fieldnames(d)) % if file is just empty
+            disptext(handles, 'Name for label file has been set');
+        else % file has some other contents that could be overwritten
+            rec.indicators{3} = 'serious_warn';
+            disptext(handles,...
+                'WARNING: label file has other (non-label) contents that will be overwritten.');
+            disptext(handles,...
+                '         See the user manual for instructions on formatting the label file.');
+        end
+    end
+else
+    disptext(handles, 'Output filename set');
+end
+
+allRecordings{idx}=rec; % store the loaded labels
+setappdata(handles.D,'recordings',allRecordings);
+setListLock(handles,0); % unlock the list box
+updateDisplay(handles);
+if strcmp(rec.indicators{3},'success')
+   % Set all indicators except for creating a calibrationData file to green
+   % It's unknown at this point whether the file contents are adequate for
+   % creating a calibrationData structure
+    ind = getappdata(handles.D,'outputIndicators');
+    setIndicator(ind(3), 'unknown')
+end
+
+
+% view or manually score a recording
+function manualBtn_Callback(hObject, eventdata, handles)
+% make sure we have the data we need
+if checkMissingEntries(handles, 0,0)
+    return
+end
+
+disptext(handles, 'Working...');
+setListLock(handles,1);
+drawnow;
+
+% check if a label file already exists, and load those labels if possible
+idx = handles.recbox.Value; % get currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+selectedFile = allRecordings{idx}.labelpath; % just get info for current recording
+labels = [];
+if isfile(selectedFile) % if the file exists
+    d = load(selectedFile); % load it
     if isfield(d,'labels') % if it has a field called labels
         labels = d.labels; % use them
     end
 end
 
-disptext(handles, 'Working...');
-drawnow;
-
-% show success animation
-ind = getappdata(handles.runBtn,'allIndicators');
+% show animation
+ind = getappdata(handles.D,'allIndicators');
 codes=animateBoxes([ind{1}(2), ind{2}(2),ind{3}(2),ind{4}(2),ind{5}(2)], 1);
 
 % launch AccuSleep_viewer to manually annotate the recording
-message = AccuSleep_viewer(getappdata(handles.runBtn,'EEG'), getappdata(handles.runBtn,'EMG'),...
+message = AccuSleep_viewer(allRecordings{idx}.EEG,...
+    allRecordings{idx}.EMG,...
     str2num(get(handles.srBox,'String')),...
-    str2num(get(handles.tsBox,'String')), labels, get(handles.outputTxt,'String'));
+    str2num(get(handles.tsBox,'String')), labels, selectedFile);
 disptext(handles, message);
 
+% complete animation
 animateBoxes([ind{1}(2), ind{2}(2),ind{3}(2),ind{4}(2),ind{5}(2)], 2, codes);
+setListLock(handles,0); % unlock list box
 
-function calibBtn_Callback(hObject, eventdata, handles) % sets calibration file path
+
+% sets calibration file path
+function calibBtn_Callback(hObject, eventdata, handles) 
 [file,path] = uigetfile('*.mat','Select .mat file containing "calibrationData" variable',...
     get(handles.calibTxt,'String')); % get user input
-if ischar(file)
+if ischar(file) % if something was selected
     disptext(handles, 'Loading calibration file...');
-    set(handles.calibTxt,'String','');
-    setappdata(handles.runBtn,'calibrationData',[]);
-    setIndicator(getappdata(handles.runBtn,'calibIndicators'), 'working')
+    set(handles.calibTxt,'String',''); % clear currently stored data
+    setappdata(handles.D,'calibrationData',[]);
+    setIndicator(getappdata(handles.D,'calibIndicators'), 'working')
     drawnow;
-    d = load([path,file]);
-    if isfield(d,'calibrationData')
-        setappdata(handles.runBtn,'calibrationData',d.calibrationData);
+    d = load([path,file]); % load the file
+    if isfield(d,'calibrationData') % if it has the field we need
+        setappdata(handles.D,'calibrationData',d.calibrationData); % store new data
         set(handles.calibTxt,'String',[path,file]);
         disptext(handles, 'Calibration file selected');
-        setIndicator(getappdata(handles.runBtn,'calibIndicators'), 'success')
+        setIndicator(getappdata(handles.D,'calibIndicators'), 'success')
     else
         disptext(handles, 'ERROR: File must contain a variable named calibrationData');
-        setIndicator(getappdata(handles.runBtn,'calibIndicators'), 'failure')
+        setIndicator(getappdata(handles.D,'calibIndicators'), 'failure')
     end
 end
 
-function netFile_Callback(hObject, eventdata, handles) % sets network file path
-[file,path] = uigetfile('*.mat','Select .mat file containing "net" variable (the trained network)',...
+
+% sets path to the trained network file
+function netFile_Callback(hObject, eventdata, handles) 
+[file,path] = uigetfile(...
+    '*.mat','Select .mat file containing "net" variable (the trained network)',...
     get(handles.netTxt,'String')); % get user input
 if ischar(file)
     disptext(handles, 'Loading trained network...');
     set(handles.netTxt,'String','');
-    setappdata(handles.runBtn,'net',[]);
-    setIndicator(getappdata(handles.runBtn,'netIndicators'), 'working')
+    setappdata(handles.D,'net',[]);
+    setIndicator(getappdata(handles.D,'netIndicators'), 'working')
     drawnow;
     d = load([path,file]);
     if isfield(d,'net')
-        setappdata(handles.runBtn,'net',d.net);
+        setappdata(handles.D,'net',d.net);
         set(handles.netTxt,'String',[path,file]);
         disptext(handles, 'Trained network file selected');
-        setIndicator(getappdata(handles.runBtn,'netIndicators'), 'success')
+        setIndicator(getappdata(handles.D,'netIndicators'), 'success')
     else
         disptext(handles, 'ERROR: File must contain a variable named net');
-        setIndicator(getappdata(handles.runBtn,'netIndicators'), 'failure')
+        setIndicator(getappdata(handles.D,'netIndicators'), 'failure')
     end
 end
 
 function createBtn_Callback(hObject, eventdata, handles) % creates a calibration data file
+setListLock(handles,1); % lock the list box
+
+idx = handles.recbox.Value; % get currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+rec = allRecordings{idx}; % the currently considered recording
+
 % make sure we have the files we need
-if checkMissingEntries(handles, 0)
+if checkMissingEntries(handles, 0, 0)
+    setListLock(handles,0); % unlock list box
     return
 end
 
 % check if label file exists
-if exist(get(handles.outputTxt,'String'))~=2
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
-    disptext(handles, 'ERROR: Sleep stage label file does not exist, see Section 4 of the user manual');
+if exist(rec.labelpath)~=2
+    animateBoxes(getappdata(handles.D,'outputIndicators'),0);
+    disptext(handles,...
+        'ERROR: Sleep stage label file does not exist, see Section 4 of the user manual');
+    setListLock(handles,0);
     return
 end
 
 % check if it has the correct contents
-d = load(get(handles.outputTxt,'String')); % load label file
+d = load(rec.labelpath); % load label file
 if isfield(d,'labels') % if it has a field called labels
     labels = d.labels; % get the labels
 else
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
+    animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: Sleep stage label file must have a variable called "labels"');
+    setListLock(handles,0);
     return
 end
 % check if all labels are outside the range 1:3
 if all(labels > 3 | labels < 1)
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
+    animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: At least some labels must be in the range 1:3.');
     disptext(handles, '       See Section 4 of the user manual.');
+    setListLock(handles,0);
     return
 end
 % check if there are at least a few labels for each state
 if ~all([sum(labels==1)>=3, sum(labels==2)>=3, sum(labels==3)>=3])
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
+    animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: At least some epochs of each stage must be labeled.');
-    disptext(handles, '       Press the Help button for details.');
+    disptext(handles, '       Click the user manual button for details.');
+    setListLock(handles,0);
     return
 end
 % check if we have a reasonable number of labels
 ts = str2num(get(handles.tsBox,'String')); % epoch length
-if sum(labels <= 3 | labels >= 1) * ts / 60 < 10
-    disptext(handles, 'WARNING: At least 10 minutes of labeled data are recommended for');
+if sum(labels <= 3 | labels >= 1) * ts / 60 < 5
+    disptext(handles, 'WARNING: At least 5 minutes of labeled data are recommended for');
     disptext(handles, '         creating a calibration data file');
-    disptext(handles, '         Press the Help button for details.');
+    disptext(handles, '         Click the user manual button for details.');
+    setListLock(handles,0);
 end
 
-EEG = getappdata(handles.runBtn,'EEG');
-EMG = getappdata(handles.runBtn,'EMG');
-if length(EEG) ~= length(EMG)
-    animateBoxes([getappdata(handles.runBtn,'eegIndicators'),...
-        getappdata(handles.runBtn,'eegIndicators')],0);
+if length(rec.EEG) ~= length(rec.EMG) % check EEEG and EMG are the same length
+    animateBoxes([getappdata(handles.D,'eegIndicators'),...
+        getappdata(handles.D,'eegIndicators')],0);
     disptext(handles, 'ERROR: EEG and EMG must be the same length');
+    setListLock(handles,0);
     return
 end
 
 % show progress animation
-ind = getappdata(handles.runBtn,'allIndicators');
+ind = getappdata(handles.D,'allIndicators');
 codes = animateBoxes([ind{1}(3), ind{2}(3),ind{3}(3),ind{4}(3),ind{5}(3)], 1);
 disptext(handles, 'Working...');
 drawnow;
 
 % create calibrationData
-oldSR = str2num(get(handles.srBox,'String'));
-calibrationData = createCalibrationData(standardizeSR(EEG, oldSR, 128),...
-    standardizeSR(EMG, oldSR, 128),...
+oldSR = str2num(get(handles.srBox,'String')); % get SR of the recordings
+calibrationData = createCalibrationData(standardizeSR(rec.EEG, oldSR, 128),...
+    standardizeSR(rec.EMG, oldSR, 128),...
     labels, 128, str2num(get(handles.tsBox,'String')));
 
 % complete progress animation
@@ -354,9 +450,10 @@ animateBoxes([ind{1}(3), ind{2}(3),ind{3}(3),ind{4}(3),ind{5}(3)], 2, codes);
 
 % check if it failed
 if isempty(calibrationData)
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
+    animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: Length of label file does not match length');
-    disptext(handles, '       of EEG/EMG. Check the epoch size?');
+    disptext(handles, '       of EEG/EMG. Check the SR or epoch size?');
+    setListLock(handles,0);
     return
 end
 
@@ -364,6 +461,7 @@ end
 [file,path] = uiputfile('*.mat','Set filename for calibration data file');
 if ~ischar(file) % if no file given
     disptext(handles, 'ERROR: No filename chosen');
+    setListLock(handles,0);
     return
 end
 
@@ -371,22 +469,29 @@ end
 save([path,file], 'calibrationData');
 disptext(handles, 'Calibration file saved');
 
-% store it
-setappdata(handles.runBtn,'calibrationData', calibrationData);
+% store calibration data
+setappdata(handles.D,'calibrationData', calibrationData);
 
 % insert filename into text box
 set(handles.calibTxt,'String', [path,file]);
-setIndicator(getappdata(handles.runBtn,'calibIndicators'), 'success')
+setIndicator(getappdata(handles.D,'calibIndicators'), 'success')
+setListLock(handles,0);
 
 
-function runBtn_Callback(hObject, eventdata, handles) % classify sleep stages automatically
+% classify sleep stages automatically
+function runBtn_Callback(hObject, eventdata, handles) 
+setListLock(handles,1); % lock the list box
+
 % check that all boxes are filled
-if checkMissingEntries(handles, 1)
+if checkMissingEntries(handles, 1, 1)
+    setListLock(handles,0);
     return
 end
 
 disptext(handles, 'Working...');
 drawnow;
+
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 
 % get minimum bout length
 minBoutLen = str2num(get(handles.boutBox,'String'));
@@ -395,141 +500,211 @@ if isempty(minBoutLen)
 end
 
 % animate
-ind = getappdata(handles.runBtn,'allIndicators');
-codes = animateBoxes([ind{1}(4), ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 1);
+ind = getappdata(handles.D,'allIndicators');
+codes = animateBoxes([ind{1}(4),...
+    ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 1);
 
-% run AccuSleep
+% get SR of the EEG/EMG data
 oldSR = str2num(get(handles.srBox,'String'));
-labels = AccuSleep_classify(standardizeSR(getappdata(handles.runBtn,'EEG'), oldSR, 128),...
-    standardizeSR(getappdata(handles.runBtn,'EMG'), oldSR, 128),...
-    getappdata(handles.runBtn,'net'),128, str2num(get(handles.tsBox,'String')),...
-    getappdata(handles.runBtn,'calibrationData'), minBoutLen);
-animateBoxes([ind{1}(4), ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 2, codes);
-if isempty(labels) % if something went wrong
-    disptext(handles, 'ERROR: No file saved, see command window for details');
-    animateBoxes([ind{1}(4), ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 0);
-    return
+
+% try to classify all recordings
+newLabels = {}; % holds new labels for each recording
+for i = 1:length(allRecordings)
+    % show progress in the message box
+    if i == 1
+        disptext(handles,['Scoring recording ',num2str(i),' of ',...
+            num2str(length(allRecordings))]);
+        drawnow;
+    else
+        t = getappdata(handles.console,'text');
+        t{end} = ['Scoring recording ',num2str(i),' of ',...
+            num2str(length(allRecordings))];
+        set(handles.console,'String',t)
+        setappdata(handles.console,'text',t);
+        drawnow;
+    end
+    
+    % run AccuSleep_classify on the recording
+    newLabels{i} = AccuSleep_classify(standardizeSR(allRecordings{i}.EEG, oldSR, 128),...
+        standardizeSR(allRecordings{i}.EMG, oldSR, 128),...
+        getappdata(handles.D,'net'),128, str2num(get(handles.tsBox,'String')),...
+        getappdata(handles.D,'calibrationData'), minBoutLen);
+    if isempty(newLabels{i}) % if something went wrong
+        % show an error message and quit. This shouldn't happen often.
+        currentList = getappdata(handles.D,'recList');
+        disptext(handles, ['ERROR: ',currentList{i},' could not be scored.']);
+        disptext(handles, '       No files have been changed. See command window for details');
+        animateBoxes([ind{1}(4),...
+            ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 0);
+        setListLock(handles,0);
+        return
+    end
 end
 
+animateBoxes([ind{1}(4),...
+    ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 2, codes);
+
 % save labels to file
-% if we need to keep existing labels...
-if ~get(handles.overwriteBox,'Value') && exist(get(handles.outputTxt,'String'), 'file')
-    d = load(get(handles.outputTxt,'String')); % load the labels
-    if isfield(d, 'labels')
-        userLabels = d.labels;
-        userLabels(userLabels < 1) = 0; % discard undefined states
-        userLabels(userLabels > 3) = 0;
-        if length(userLabels) ~= length(labels)
-            % the labels exist, but are the wrong length. ask to proceed
-            answer = questdlg('The length of the existing labels does not match the new labels.', ...
-                'Problem with label length', ...
-                'Replace old labels','Cancel','Cancel');
-            if strcmp(answer,'Cancel')
-                return
+for i = 1:length(allRecordings)
+    % if we need to keep existing labels...
+    if get(handles.overwriteBox,'Value') && exist(allRecordings{i}.labelpath, 'file')
+        d = load(allRecordings{i}.labelpath); % load the labels
+        if isfield(d, 'labels')
+            userLabels = d.labels;
+            userLabels(userLabels < 1) = 0; % discard undefined states
+            userLabels(userLabels > 3) = 0;
+            if length(userLabels) ~= length(newLabels{i})
+                % the labels exist, but are the wrong length. ask to proceed
+                currentList = getappdata(handles.D,'recList');
+                answer = questdlg(...
+                    ['The length of the existing labels for ',...
+                    currentList{i},' does not match the new labels. ',...
+                    'This could be caused by a discrepancy in the ',...
+                    'sampling rate or epoch length.'], ...
+                    'Problem with label length', ...
+                    'Replace old labels','Cancel','Cancel');
+                if strcmp(answer,'Cancel')
+                    disptext(handles, [currentList{i},' was not scored.']);
+                    continue
+                end
+            else
+                % take existing labels (that aren't undefined)
+                newLabels{i}(userLabels > 0) = userLabels(userLabels > 0);
             end
         else
-            % take existing labels
-            labels(userLabels > 0) = userLabels(userLabels > 0);
+            % the file exists, but does not have a label file. ask to proceed
+            currentList = getappdata(handles.D,'recList');
+            answer = questdlg(['The labels file for ',...
+                currentList{i},' does not contain a "labels" variable.',...
+                'It may have other contents.'], ...
+                'Warning', ...
+                'Overwrite file','Cancel','Cancel');
+            if strcmp(answer,'Cancel')
+                disptext(handles, [currentList{i},' was not scored.']);
+                continue
+            end
         end
-    else
-        % the file exists, but does not have a label file. ask to proceed
-        answer = questdlg('The existing file does not contain a "labels" variable.', ...
-            'Warning', ...
-            'Overwrite file','Cancel','Cancel');
-        if strcmp(answer,'Cancel')
+    end
+    % save labels to file
+    labels = newLabels{i};
+    save(allRecordings{i}.labelpath, 'labels'); 
+end
+disptext(handles, 'Finished scoring recordings.'); 
+setListLock(handles,0); % unlock list box
+
+
+% check if anything is missing before classification
+% arguments: handles structure, whether to examine calibration and network
+% fields also, and whether to look through all recordings or just the
+% selected one
+function [missing] = checkMissingEntries(handles, checkAllFields, checkAllRecs)
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+
+% determine which recordings to check
+if ~checkAllRecs
+    idx1 = handles.recbox.Value;
+    idx2 = idx1;
+else
+    idx1 = 1;
+    idx2 = length(allRecordings);
+end
+% get names of list items
+currentList = getappdata(handles.D,'recList');
+
+for i = idx1:idx2 % for all recordings (or just one)
+    rec = allRecordings{i}; % get selected recording
+    missing = 1; % assume something is missing
+    if isempty(handles.srBox.String)
+        animateBoxes(getappdata(handles.D,'srIndicators'),0);
+        disptext(handles, 'ERROR: Please specify EEG/EMG sampling rate');
+        return
+    end
+    % perform various checks
+    if isempty(handles.tsBox.String)
+        animateBoxes(getappdata(handles.D,'tsIndicators'),0);
+        disptext(handles, 'ERROR: Please set the epoch length for sleep stage labels');
+        return
+    end
+    if ~isnumeric(str2num(get(handles.srBox,'String'))) ||...
+            ~isnumeric(str2num(get(handles.tsBox,'String')))
+        animateBoxes([getappdata(handles.D,'srIndicators'),...
+            getappdata(handles.D,'tsIndicators')],0);
+        disptext(handles, 'ERROR: Sampling rate and epoch length must be numeric');
+        return
+    end
+    if str2num(get(handles.srBox,'String')) <= 0 ||...
+            str2num(get(handles.tsBox,'String')) <= 0
+        animateBoxes([getappdata(handles.D,'srIndicators'),...
+            getappdata(handles.D,'tsIndicators')],0);
+        disptext(handles, 'ERROR: Sampling rate and epoch length must be positive');
+        return
+    end
+    if isempty(rec.EEGpath)
+        animateBoxes(getappdata(handles.D,'eegIndicators'),0);
+        disptext(handles, ['ERROR: Please load an EEG file for ',...
+            currentList{i}]);
+        return
+    end
+    if isempty(rec.EMGpath)
+        animateBoxes(getappdata(handles.D,'emgIndicators'),0);
+        disptext(handles, ['ERROR: Please load an EMG file for ',...
+            currentList{i}]);
+        return
+    end
+    if isempty(rec.labelpath)
+        animateBoxes(getappdata(handles.D,'outputIndicators'),0);
+        disptext(handles,...
+            ['ERROR: Please specify a filename for the sleep stage labels for ',...
+            currentList{i}]);
+        return
+    end
+    
+    if checkAllFields == 1 % if we need to check other fields, too
+        if isempty(handles.calibTxt.String)
+            animateBoxes(getappdata(handles.D,'calibIndicators'),0);
+            disptext(handles, 'ERROR: Please select or create a calibration data file');
+            return
+        end
+        if isempty(handles.netTxt.String)
+            animateBoxes(getappdata(handles.D,'netIndicators'),0);
+            disptext(handles, 'ERROR: Please select a trained network file');
             return
         end
     end
+    % passed all checks
+    missing = 0;
 end
-save(get(handles.outputTxt,'String'), 'labels'); % save data to file
-disptext(handles, ['Labels saved to ', get(handles.outputTxt,'String')]);
-% check if anything is missing before classification
-function [missing] = checkMissingEntries(handles, mode) 
-missing = 1;
-if isempty(handles.eegTxt.String)
-    animateBoxes(getappdata(handles.runBtn,'eegIndicators'),0);
-    disptext(handles, 'ERROR: Please load an EEG file');
-    return
-end
-if isempty(handles.emgTxt.String)
-    animateBoxes(getappdata(handles.runBtn,'emgIndicators'),0);
-    disptext(handles, 'ERROR: Please load an EMG file');
-    return
-end
-if isempty(handles.outputTxt.String)
-    animateBoxes(getappdata(handles.runBtn,'outputIndicators'),0);
-    disptext(handles, 'ERROR: Please specify a filename for the sleep stage labels');
-    return
-end
-if isempty(handles.srBox.String)
-    animateBoxes(getappdata(handles.runBtn,'srIndicators'),0);
-    disptext(handles, 'ERROR: Please specify EEG/EMG sampling rate');
-    return
-end
-if isempty(handles.tsBox.String)
-    animateBoxes(getappdata(handles.runBtn,'tsIndicators'),0);
-    disptext(handles, 'ERROR: Please set the epoch length for sleep stage labels');
-    return
-end
-if ~isnumeric(str2num(get(handles.srBox,'String'))) || ~isnumeric(str2num(get(handles.tsBox,'String')))
-    animateBoxes([getappdata(handles.runBtn,'srIndicators'),...
-        getappdata(handles.runBtn,'tsIndicators')],0);
-    disptext(handles, 'ERROR: Sampling rate and epoch length must be numeric');
-    return
-end
-if str2num(get(handles.srBox,'String')) <= 0 || str2num(get(handles.tsBox,'String')) <= 0
-    animateBoxes([getappdata(handles.runBtn,'srIndicators'),...
-        getappdata(handles.runBtn,'tsIndicators')],0);
-    disptext(handles, 'ERROR: Sampling rate and epoch length must be positive');
-    return
-end
-if mode == 1 % automatic rather than manual
-    if isempty(handles.calibTxt.String)
-        animateBoxes(getappdata(handles.runBtn,'calibIndicators'),0);
-        disptext(handles, 'ERROR: Please select or create a calibration data file');
-        return
-    end
-    if isempty(handles.netTxt.String)
-        animateBoxes(getappdata(handles.runBtn,'netIndicators'),0);
-        disptext(handles, 'ERROR: Please select a trained network file');
-        return
-    end
-end
-missing = 0;
 
-
-% miscellaneous callbacks
+% what to do when new SR is entered
 function srBox_Callback(hObject, eventdata, handles)
-% setIndicator(getappdata(handles.runBtn,'srIndicators'), [.96 .35 .35])
-setIndicator(getappdata(handles.runBtn,'srIndicators'), 'failure')
+setIndicator(getappdata(handles.D,'srIndicators'), 'failure')
 sr = str2num(get(handles.srBox,'String'));
 if ~isempty(sr) % if it's a number
     if sr > 0 % and positive
         if sr >= 128
-            setIndicator(getappdata(handles.runBtn,'srIndicators'), 'success')
+            setIndicator(getappdata(handles.D,'srIndicators'), 'success')
         else
-            setIndicator(getappdata(handles.runBtn,'srIndicators'), 'warning')
+            setIndicator(getappdata(handles.D,'srIndicators'), 'warning')
             disptext(handles, 'WARNING: Sampling rate of at least 128Hz recommended');
         end
     end
 end
-
 
 function srBox_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
+% what to do when new epoch length is entered
 function tsBox_Callback(hObject, eventdata, handles)
-% setIndicator(getappdata(handles.runBtn,'tsIndicators'), [.96 .35 .35])
-setIndicator(getappdata(handles.runBtn,'tsIndicators'), 'failure')
+setIndicator(getappdata(handles.D,'tsIndicators'), 'failure')
 ts = str2num(get(handles.tsBox,'String'));
 if ~isempty(ts) % if it's a number
     if ts > 0 % and positive
         if ts >= 2 % in the range we've tested
-            setIndicator(getappdata(handles.runBtn,'tsIndicators'), 'success')
+            setIndicator(getappdata(handles.D,'tsIndicators'), 'success')
         else
-            setIndicator(getappdata(handles.runBtn,'tsIndicators'), 'serious_warn')
+            setIndicator(getappdata(handles.D,'tsIndicators'), 'serious_warn')
             disptext(handles, 'WARNING: Epoch length less than 2 seconds not recommended');
         end
     end
@@ -541,7 +716,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% add some line of text to the console window
+% add a line of text to the message box
 function disptext(handles, string)
 t = getappdata(handles.console,'text');
 ln = getappdata(handles.console,'line');
@@ -555,6 +730,7 @@ end
 set(handles.console,'String',t)
 setappdata(handles.console,'text',t);
 setappdata(handles.console,'line',ln);
+
 
 % make some list of indicators a given color
 function setIndicator(handles, code)
@@ -596,8 +772,6 @@ for i = 1:length(handles)
     setappdata(handles(i),'code',code);
 end
 
-
-
 % whether to overwrite existing (not undefined) sleep stage labels after classification
 function overwriteBox_Callback(hObject, eventdata, handles)
 
@@ -618,7 +792,6 @@ function [codes] = animateBoxes(handles, animation, codes)
 if nargin < 3 % failure or working
     codes = {};
     for i = 1:length(handles)
-        %         colors{i} = get(handles(i),'BackgroundColor');
         codes{i} = getappdata(handles(i),'code');
     end
 end
@@ -627,12 +800,12 @@ switch animation
         % if success % show working animation
         t = .037;
         if animation==1
-            for i = 1:(length(handles))  
+            for i = 1:(length(handles))
                 pause(t)
                 setIndicator(handles(i),'working');
-            end     
+            end
         else
-            for i = 1:(length(handles))  
+            for i = 1:(length(handles))
                 pause(t)
                 setIndicator(handles(i),codes{i});
             end
@@ -661,3 +834,119 @@ d = f(1:s(end));
 % --- Executes on button press in helpBtn.
 function helpBtn_Callback(hObject, eventdata, handles)
 doc AccuSleep_instructions
+
+
+% --- Executes on selection change in recbox.
+function recbox_Callback(hObject, eventdata, handles)
+updateDisplay(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function recbox_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in addrecbtn.
+% adds a recording to the list
+function addrecbtn_Callback(hObject, eventdata, handles)
+% get the current state of the list
+currentList = getappdata(handles.D,'recList');
+recCountMax = getappdata(handles.D,'recCountMax');
+% add a new recording to the list
+currentList{end+1} = ['Recording ',num2str(recCountMax+1)];
+setappdata(handles.D,'recCountMax',recCountMax+1);
+% update the list box
+set(handles.recbox,'String',currentList);
+% update our stored list of recordings
+setappdata(handles.D,'recList',currentList);
+% and update our set of recording data structures
+setappdata(handles.D,'recordings',...
+    [getappdata(handles.D,'recordings'),makeRecordingObject()]);
+% update the display
+updateDisplay(handles);
+
+% --- Executes on button press in removerecbtn.
+% removes a recording from the list
+function removerecbtn_Callback(hObject, eventdata, handles)
+% get index of recording to remove from the list
+idx = handles.recbox.Value;
+% get the current list
+currentList = getappdata(handles.D,'recList');
+% if this is the last item in the list, clear its contents
+if length(currentList) == 1
+    % clear first recording's data
+    setappdata(handles.D,'recordings',{makeRecordingObject()});
+    % update the display
+    updateDisplay(handles);
+    return
+end
+% make sure the value attribute of the list stays in a safe range
+if idx == length(currentList)
+    set(handles.recbox,'Value',length(currentList)-1)
+end
+% remove item from the current list
+currentList(idx) = [];
+% update the list box
+set(handles.recbox,'String',currentList);
+% update our stored list of recordings
+setappdata(handles.D,'recList',currentList);
+% and update our set of recording data structures
+currentRecordings = getappdata(handles.D,'recordings');
+currentRecordings(idx) = [];
+setappdata(handles.D,'recordings',currentRecordings);
+% update the display
+updateDisplay(handles);
+
+% create an object to store data for a single recording
+function [x] = makeRecordingObject()
+x = struct;
+x.EEG = []; % eeg data
+x.EMG = []; % emg data
+x.EEGlen = []; % length of EEG signal
+x.EMGlen = [];
+x.EEGpath = ''; % path to EEG file
+x.EMGpath = '';
+x.labelpath = '';
+x.indicators = {'failure','failure','failure'}; % status of indicators (EEG,EMG,labels)
+
+% update the text boxes and indicators when something changes
+function [] = updateDisplay(handles)
+idx = handles.recbox.Value; % get currently selected recording
+allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
+rec = allRecordings{idx}; % just get info for current recording
+% show file paths
+set(handles.eegTxt,'String',rec.EEGpath);
+set(handles.emgTxt,'String',rec.EMGpath);
+set(handles.outputTxt,'String',rec.labelpath);
+% set the associated indicators
+setIndicator(getappdata(handles.D,'eegIndicators'), rec.indicators{1});
+setIndicator(getappdata(handles.D,'emgIndicators'), rec.indicators{2});
+setIndicator(getappdata(handles.D,'outputIndicators'), rec.indicators{3});
+
+% indicator for all recordings can only show 'success' if all recordings
+%     are also 'success'
+overallIndicators = {'success','success','success'};
+for j = 1:3 % for each indicator
+    for i = 1:length(allRecordings) % for each recording
+        if ~strcmp(allRecordings{i}.indicators{j},'success') % if it's not a success
+            overallIndicators{j} = allRecordings{i}.indicators{j}; % show that
+            if strcmp(overallIndicators{j},'failure') % 'failure' overrides all others
+                break
+            end
+        end
+    end
+end
+% set the indicators
+setIndicator(handles.eeg4,overallIndicators{1});
+setIndicator(handles.emg4,overallIndicators{2});
+setIndicator(handles.output4,overallIndicators{3});
+
+% lock the list box while the program is busy (1), or unlock it (0)
+function [] = setListLock(handles,locked)
+if locked
+    set(handles.recbox,'Enable','off');
+else
+    set(handles.recbox,'Enable','on');
+end
