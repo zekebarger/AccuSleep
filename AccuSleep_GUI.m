@@ -274,13 +274,6 @@ allRecordings{idx}=rec; % store the loaded labels
 setappdata(handles.D,'recordings',allRecordings);
 setListLock(handles,0); % unlock the list box
 updateDisplay(handles);
-if strcmp(rec.indicators{3},'success')
-   % Set all indicators except for creating a calibrationData file to green
-   % It's unknown at this point whether the file contents are adequate for
-   % creating a calibrationData structure
-    ind = getappdata(handles.D,'outputIndicators');
-    setIndicator(ind(3), 'unknown')
-end
 
 
 % view or manually score a recording
@@ -942,6 +935,12 @@ end
 setIndicator(handles.eeg4,overallIndicators{1});
 setIndicator(handles.emg4,overallIndicators{2});
 setIndicator(handles.output4,overallIndicators{3});
+% It can't be determined in advance whether the labels are adequate for
+% creating a calibrationData structure
+if strcmp(rec.indicators{3},'success')
+    ind = getappdata(handles.D,'outputIndicators');
+    setIndicator(ind(3), 'unknown')
+end
 
 % lock the list box while the program is busy (1), or unlock it (0)
 function [] = setListLock(handles,locked)
