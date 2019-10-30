@@ -1,7 +1,6 @@
 function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepath)
 %AccuSleep_viewer A GUI for manually assigning sleep stage labels to EEG/EMG data.
-%   Zeke Barger. 10/29/19. 
-%   An early version of this interface was created by Franz Weber.
+%   Zeke Barger 103019
 %   Arguments:
 %   EEG: the EEG signal as a vector
 %   EMG: the EMG signal as a vector
@@ -90,7 +89,7 @@ G.unsavedChanges = 0; % whether anything has changed since user last saved
 if ~isempty(G.labels)
     if length(G.labels) ~= G.nbins
         disp(['length of labels must be ',num2str(G.nbins),' for this recording'])
-        message = 'ERROR: EEG/EMG and labels are different lengths (try checking SR and epoch size?)';
+        message = 'ERROR: Length of labels file does not match EEG/EMG. Check SR / epoch length?';
         return
     end
 else % if no sleep stages provided, set to undefined
