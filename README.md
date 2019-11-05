@@ -62,6 +62,7 @@ https://osf.io/py5eb/
 - Make sure to click the 'Help' button in AccuSleep_viewer for a list of keyboard shortcuts.
 - Make sure to run `doc AccuSleep_instructions` and read the documentation before using
   this software.
+- Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
 ## Screenshots
 ![alt test](https://i.imgur.com/zeoqlfP.png)
