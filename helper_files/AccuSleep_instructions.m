@@ -50,15 +50,15 @@ function AccuSleep_instructions
 % 
 % There are five types of files associated with AccuSleep:
 % 
-% EEG file: a .mat file containing a variable named ‘EEG’ that is a 1-D
+% EEG file: a .mat file containing a variable named â€˜EEGâ€™ that is a 1-D
 %    numeric matrix. No filtering or other preprocessing is necessary. 
 %    This should be a 1-channel electroencephalogram signal.
 % 
-% EMG file: same format as EEG, but the variable is named ‘EMG’. The EEG
+% EMG file: same format as EEG, but the variable is named â€˜EMGâ€™. The EEG
 %    and EMG data must be the same length. This should be a 1-channel 
 %    electromyogram signal.
 % 
-% Label file: a .mat file containing a variable called ‘labels’ that is
+% Label file: a .mat file containing a variable called â€˜labelsâ€™ that is
 %    a 1-D numeric matrix with values ranging from 1-4 (1 = REM sleep, 
 %    2 = wakefulness, 3 = NREM sleep, 4 = undefined) corresponding to
 %    the sleep stage in each epoch. 
@@ -79,16 +79,16 @@ function AccuSleep_instructions
 %    (in seconds) are set. The epoch length determines the time 
 %    resolution of the labels. Typical values are 2.5, 4, and 5.
 %
-% 2. Click the ‘Load EEG file’ button to load the EEG data.
+% 2. Click the â€˜Select EEG fileâ€™ button to set the location of the EEG data.
 % 
-% 3. Click the ‘Load EMG file’ button to load the EMG data.
+% 3. Click the â€˜Select EMG fileâ€™ button to set the location of the EMG data.
 % 
-% 4. Click ‘Set / load label file’ and enter a filename for saving the
+% 4. Click â€˜Set / load label fileâ€™ and enter a filename for saving the
 %    sleep stage labels. You can also select an existing label file if
 %    you wish to view or modify its contents.
 % 
-% 5. Click 'Score selected manually’ to launch an interactive figure 
-%    window for manual sleep stage labeling. Click the ‘help’ button in
+% 5. Click 'Score selected manuallyâ€™ to launch an interactive figure 
+%    window for manual sleep stage labeling. Click the â€˜helpâ€™ button in
 %    the upper right of the figure for instructions. Click the save 
 %    button at any time to save the sleep stage labels to the file 
 %    specified in step 4, and close the window when you are finished.
@@ -114,7 +114,7 @@ function AccuSleep_instructions
 % 
 % Instructions for creating a calibration data file using this GUI are 
 % below. You can also run createCalibrationData.m and save the output 
-% in a .mat file in a variable called ‘calibrationData’.
+% in a .mat file in a variable called â€˜calibrationDataâ€™.
 % 
 % 1. Complete steps 1-4 of Section 3 (specifying the EEG file, EMG file,
 %    label file, sampling rate, and epoch length).
@@ -124,10 +124,10 @@ function AccuSleep_instructions
 %    least several minutes of each stage, and more labels will improve 
 %    classification accuracy. If the label file already meets this 
 %    condition, continue to step 3. Otherwise, click 
-%    ‘Score selected manually’, assign some sleep stage labels to the 
+%    â€˜Score selected manuallyâ€™, assign some sleep stage labels to the 
 %    recording, and save the labels. 
 % 
-% 3. Click ‘Create calibration data file’.
+% 3. Click â€˜Create calibration data fileâ€™.
 % 
 % 4. Enter a filename for the calibration data file.
 % 
@@ -139,7 +139,7 @@ function AccuSleep_instructions
 % network, see AccuSleep_train.m for details. You will need to create a 
 % cell array containing filenames of EEG, EMG, and label files in the 
 % training set. AccuSleep_train produces a SeriesNetwork object. Name 
-% this variable ‘net’ and save it in a .mat file. You can then load it 
+% this variable â€˜netâ€™ and save it in a .mat file. You can then load it 
 % in step 3 of Section 4C.
 % 
 % 
@@ -160,26 +160,26 @@ function AccuSleep_instructions
 % 
 % 2. If you completed the steps in Section 4A, a calibration data file 
 %    has already been specified. Otherwise, click 
-%    ‘Load calibration file’ to load the calibration data file.
+%    â€˜Load calibration fileâ€™ to load the calibration data file.
 % 
-% 3. Click ‘Load trained network file’ to load the trained neural
+% 3. Click â€˜Load trained network fileâ€™ to load the trained neural
 %    network. The epoch length used when training this network should be
 %    the same as the current epoch length.
 % 
 % 4. If you wish to preserve any existing labels in the label file, and
 %    only overwrite undefined epochs, check the box labeled
-%    ‘Only overwrite undefined epochs'.
+%    â€˜Only overwrite undefined epochs'.
 % 
 % 5. Set the minimum bout length, in seconds. A typical value is 5. 
 %    Following automatic labeling, any sleep stage bout shorter than this 
 %    duration will be reassigned to the surrounding stage (if the stages 
 %    on either side of the bout match). 
 % 
-% 6. Click ‘Score all automatically’ to score all recordings in the
+% 6. Click â€˜Score all automaticallyâ€™ to score all recordings in the
 %    recording list. Labels will be saved to the file specified by 
-%    the ‘Set / load label file’ field of each recording. You can click 
-%    'Score selected manually’ to visualize the results. Note that unless
-%    the ‘Only overwrite undefined epochs' box is checked, any other
+%    the â€˜Set / load label fileâ€™ field of each recording. You can click 
+%    'Score selected manuallyâ€™ to visualize the results. Note that unless
+%    the â€˜Only overwrite undefined epochs' box is checked, any other
 %    contents (e.g., other variables) in the existing label file will 
 %    be automatically overwritten.
 % 
