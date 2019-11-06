@@ -144,7 +144,7 @@ if ~isempty(EEGvar) % if we found a variable named 'EEG'
     disptext(handles, 'EEG file selected');
     % check if EEG/EMG are the same length
     if ~isempty(get(handles.emgTxt,'String')) % if EMG file has been selected
-        if getappdata(handles.D,'EEGlen') ~= getappdata(handles.D,'EMGlen')
+        if rec.EEGlen ~= rec.EMGlen
             rec.indicators{1} = 'serious_warn';
             rec.indicators{2} = 'serious_warn';
             disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
@@ -221,7 +221,7 @@ if ~isempty(EMGvar) % if we found a variable named 'EMG'
     
     disptext(handles, 'EMG file selected');
     if ~isempty(get(handles.eegTxt,'String'))
-        if getappdata(handles.D,'EEGlen') ~= getappdata(handles.D,'EMGlen')
+        if rec.EEGlen ~= rec.EMGlen
             rec.indicators{1} = 'serious_warn';
             rec.indicators{2} = 'serious_warn';
             disptext(handles, 'WARNING: EEG and EMG are not currently the same length');
