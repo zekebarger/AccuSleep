@@ -1,10 +1,13 @@
 # AccuSleep
 
 ## Updates
+**11/05/2019** - EEG/EMG data are now only loaded when necessary to avoid out-of-memory errors.
+    **Please replace any older versions of AccuSleep with this one.**
+    
 **10/30/2019** - The primary user interface has received a major update, and now
     allows all recordings from one subject to be processed simultaneously. A 
     small bug was also fixed, the user manual was updated, and error messages 
-    should be more helpful. **Please replace any older versions of AccuSleep with this one.**
+    should be more helpful. 
 
 ## Description
 
@@ -62,6 +65,8 @@ https://osf.io/py5eb/
 - Make sure to click the 'Help' button in AccuSleep_viewer for a list of keyboard shortcuts.
 - Make sure to run `doc AccuSleep_instructions` and read the documentation before using
   this software.
+- If your recordings are very long (>48 hours) and are not displaying properly, try splitting
+  them into smaller files.
 - Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
 ## Screenshots
