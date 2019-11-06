@@ -1,8 +1,9 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger 103019
+% Zeke Barger 110519
 % To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
+
 
 % Begin initialization code - do not edit
 gui_Singleton = 1;
@@ -81,7 +82,7 @@ text(handles.axes1,.49,.504,'AccuSleep','FontSize',43,'Rotation',90,'Color',[.17
 function varargout = AccuSleep_GUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
-% loads EEG data
+% selects file with EEG data
 function eegBtn_Callback(hObject, eventdata, handles) 
 % choose default location to look for EEG file
 currentEEGpath = get(handles.eegTxt,'String');
@@ -103,17 +104,29 @@ idx = handles.recbox.Value; % get index of currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 rec = allRecordings{idx}; % just get contents of selected recording
 
-disptext(handles, 'Loading EEG...'); % show a helpful message
+disptext(handles, 'Inspecting EEG file...'); % show a helpful message
 set(handles.eegTxt,'String',''); % clear the stored EEG-related data
-rec.EEG = [];
 rec.EEGpath = '';
 setIndicator(getappdata(handles.D,'eegIndicators'), 'working')
 drawnow;
 
-d = load([path,file]); % load the data
-if isfield(d,'EEG')
-    % check that it's the right shape
-    if (length(size(d.EEG))>2 || min(size(d.EEG))>1) || (isempty(d.EEG) || ~isnumeric(d.EEG))
+fileContents = whos('-file',[path,file]); % get information about file contents
+EEGvar = []; % just keep info about the EEG variable (if it exists)
+% look for a variable named 'EEG'
+for i = 1:length(fileContents)
+    if strcmp('EEG',fileContents(i).name)
+        EEGvar = fileContents(i);
+        break
+    end
+end
+
+if ~isempty(EEGvar) % if we found a variable named 'EEG'
+    % check that it's the right shape, and is numeric
+    numericClasses = {'int8', 'uint8', 'int16', 'uint16', ...
+        'int32', 'uint32', 'int64', 'uint64','double','single'};
+    
+    if (length(EEGvar.size)>2 || min(EEGvar.size)~=1) || ...
+            ~any(strcmp(EEGvar.class, numericClasses))
         disptext(handles, 'ERROR: EEG variable must be a numeric 1D matrix');
         % update the recording's information
         rec.indicators{1} = 'failure';
@@ -123,15 +136,14 @@ if isfield(d,'EEG')
         updateDisplay(handles); % update the display
         return
     end
-    % store the data
-    rec.EEG = d.EEG;
-    rec.EEGlen = length(d.EEG);
+    % store the information
+    rec.EEGlen = max(EEGvar.size);
     rec.EEGpath = [path,file];
     rec.indicators{1} = 'success';
     
     disptext(handles, 'EEG file selected');
     % check if EEG/EMG are the same length
-    if ~isempty(get(handles.emgTxt,'String')) % if EMG data has been loaded
+    if ~isempty(get(handles.emgTxt,'String')) % if EMG file has been selected
         if getappdata(handles.D,'EEGlen') ~= getappdata(handles.D,'EMGlen')
             rec.indicators{1} = 'serious_warn';
             rec.indicators{2} = 'serious_warn';
@@ -150,7 +162,7 @@ setappdata(handles.D,'recordings',allRecordings);
 setListLock(handles,0); % unlock the list
 updateDisplay(handles); % update the display
 
-% loads EMG data
+% selects EMG data file
 function emgBtn_Callback(hObject, eventdata, handles) 
 currentEEGpath = get(handles.eegTxt,'String');
 currentEMGpath = get(handles.emgTxt,'String');
@@ -170,17 +182,29 @@ idx = handles.recbox.Value; % get currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 rec = allRecordings{idx}; % just get info for current recording
 
-disptext(handles, 'Loading EMG...');
+disptext(handles, 'Inspecting EMG file...');
 set(handles.emgTxt,'String','');
-rec.EMG = [];
 rec.EMGpath = '';
 setIndicator(getappdata(handles.D,'emgIndicators'), 'working')
 drawnow;
 
-d = load([path,file]);
-if isfield(d,'EMG')
-    % check that it's the right shape
-    if (length(size(d.EMG))>2 || min(size(d.EMG))>1) || (isempty(d.EMG) || ~isnumeric(d.EMG))
+fileContents = whos('-file',[path,file]); % get information about file contents
+EMGvar = []; % just keep info about the EMG variable (if it exists)
+% look for a variable named 'EMG'
+for i = 1:length(fileContents)
+    if strcmp('EMG',fileContents(i).name)
+        EMGvar = fileContents(i);
+        break
+    end
+end
+
+if ~isempty(EMGvar) % if we found a variable named 'EMG'
+    % check that it's the right shape, and is numeric
+    numericClasses = {'int8', 'uint8', 'int16', 'uint16', ...
+        'int32', 'uint32', 'int64', 'uint64','double','single'};
+    
+    if (length(EMGvar.size)>2 || min(EMGvar.size)~=1) || ...
+            ~any(strcmp(EMGvar.class, numericClasses))
         disptext(handles, 'ERROR: EMG variable must be a numeric 1D matrix');
         % update the recording's information
         rec.indicators{2} = 'failure';
@@ -190,9 +214,8 @@ if isfield(d,'EMG')
         updateDisplay(handles); % update the display
         return
     end
-    % store the data
-    rec.EMG = d.EMG;
-    rec.EMGlen = length(d.EMG);
+    % store the information
+    rec.EMGlen = max(EMGvar.size);
     rec.EMGpath = [path,file];
     rec.indicators{2} = 'success';
     
@@ -303,9 +326,12 @@ end
 ind = getappdata(handles.D,'allIndicators');
 codes=animateBoxes([ind{1}(2), ind{2}(2),ind{3}(2),ind{4}(2),ind{5}(2)], 1);
 
+% load the EEG/EMG data
+eegFile = load(allRecordings{idx}.EEGpath,'EEG');
+emgFile = load(allRecordings{idx}.EMGpath,'EMG');
+
 % launch AccuSleep_viewer to manually annotate the recording
-message = AccuSleep_viewer(allRecordings{idx}.EEG,...
-    allRecordings{idx}.EMG,...
+message = AccuSleep_viewer(eegFile.EEG, emgFile.EMG,...
     str2num(get(handles.srBox,'String')),...
     str2num(get(handles.tsBox,'String')), labels, selectedFile);
 disptext(handles, message);
@@ -418,7 +444,7 @@ if sum(labels <= 3 | labels >= 1) * ts / 60 < 5
     setListLock(handles,0);
 end
 
-if length(rec.EEG) ~= length(rec.EMG) % check EEEG and EMG are the same length
+if rec.EEGlen ~= rec.EMGlen % check EEG and EMG are the same length
     animateBoxes([getappdata(handles.D,'eegIndicators'),...
         getappdata(handles.D,'eegIndicators')],0);
     disptext(handles, 'ERROR: EEG and EMG must be the same length');
@@ -432,10 +458,14 @@ codes = animateBoxes([ind{1}(3), ind{2}(3),ind{3}(3),ind{4}(3),ind{5}(3)], 1);
 disptext(handles, 'Working...');
 drawnow;
 
+% load the EEG/EMG data
+eegFile = load(rec.EEGpath,'EEG');
+emgFile = load(rec.EMGpath,'EMG');
+
 % create calibrationData
 oldSR = str2num(get(handles.srBox,'String')); % get SR of the recordings
-calibrationData = createCalibrationData(standardizeSR(rec.EEG, oldSR, 128),...
-    standardizeSR(rec.EMG, oldSR, 128),...
+calibrationData = createCalibrationData(standardizeSR(eegFile.EEG, oldSR, 128),...
+    standardizeSR(emgFile.EMG, oldSR, 128),...
     labels, 128, str2num(get(handles.tsBox,'String')));
 
 % complete progress animation
@@ -517,9 +547,13 @@ for i = 1:length(allRecordings)
         drawnow;
     end
     
+    % load the EEG/EMG data
+    eegFile = load(allRecordings{i}.EEGpath,'EEG');
+    emgFile = load(allRecordings{i}.EMGpath,'EMG');
+    
     % run AccuSleep_classify on the recording
-    newLabels{i} = AccuSleep_classify(standardizeSR(allRecordings{i}.EEG, oldSR, 128),...
-        standardizeSR(allRecordings{i}.EMG, oldSR, 128),...
+    newLabels{i} = AccuSleep_classify(standardizeSR(eegFile.EEG, oldSR, 128),...
+        standardizeSR(emgFile.EMG, oldSR, 128),...
         getappdata(handles.D,'net'),128, str2num(get(handles.tsBox,'String')),...
         getappdata(handles.D,'calibrationData'), minBoutLen);
     if isempty(newLabels{i}) % if something went wrong
@@ -634,13 +668,13 @@ for i = idx1:idx2 % for all recordings (or just one)
     end
     if isempty(rec.EEGpath)
         animateBoxes(getappdata(handles.D,'eegIndicators'),0);
-        disptext(handles, ['ERROR: Please load an EEG file for ',...
+        disptext(handles, ['ERROR: Please select an EEG file for ',...
             currentList{i}]);
         return
     end
     if isempty(rec.EMGpath)
         animateBoxes(getappdata(handles.D,'emgIndicators'),0);
-        disptext(handles, ['ERROR: Please load an EMG file for ',...
+        disptext(handles, ['ERROR: Please select an EMG file for ',...
             currentList{i}]);
         return
     end
@@ -895,8 +929,6 @@ updateDisplay(handles);
 % create an object to store data for a single recording
 function [x] = makeRecordingObject()
 x = struct;
-x.EEG = []; % eeg data
-x.EMG = []; % emg data
 x.EEGlen = []; % length of EEG signal
 x.EMGlen = [];
 x.EEGpath = ''; % path to EEG file
