@@ -38,6 +38,10 @@ call the required functions yourself.
 To download the data used for training and testing AccuSleep, please visit
 https://osf.io/py5eb/
 
+## Requirements
+- MATLAB version 2016b or later
+- Statistics and Machine Learning Toolbox
+
 ## Functions
 
 - **`AccuSleep_GUI`**. A user interface for labeling sleep states, either
@@ -49,10 +53,6 @@ https://osf.io/py5eb/
 - **`createCalibrationData`**. Generates a file that is required for automatic
     sleep state labeling for a given combination of subject and
     recording equipment
-
-## Requirements
-- MATLAB version 2016b or later
-- Statistics and Machine Learning Toolbox
 
 ## Tips & Troubleshooting
 - Using more data for calibration will produce better results. However, labeling 
