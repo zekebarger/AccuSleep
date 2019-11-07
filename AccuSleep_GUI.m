@@ -274,8 +274,8 @@ rec.labelpath = [path,file]; % store the input
 rec.indicators{3} = 'success';
 
 % try to load the file
-if isfile(get(handles.outputTxt,'String')) % if the file exists
-    d = load(get(handles.outputTxt,'String')); % load it
+if exist(rec.labelpath)==2 % if the file exists
+    d = load(rec.labelpath); % load it
     if isfield(d,'labels') % if it has a field called labels
         disptext(handles,'Label file found');
     else
