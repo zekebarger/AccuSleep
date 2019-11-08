@@ -39,7 +39,7 @@ To download the data used for training and testing AccuSleep, please visit
 https://osf.io/py5eb/
 
 ## Requirements
-- MATLAB version 2016b or later
+- MATLAB version 2017b or later
 - Statistics and Machine Learning Toolbox
 
 ## Functions
