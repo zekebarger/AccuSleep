@@ -138,9 +138,10 @@ function AccuSleep_instructions
 % lengths of 2.5, 4, 5, and 10 seconds. If you wish to train your own 
 % network, see AccuSleep_train.m for details. You will need to create a 
 % cell array containing filenames of EEG, EMG, and label files in the 
-% training set. AccuSleep_train produces a SeriesNetwork object. Name 
-% this variable ‘net’ and save it in a .mat file. You can then load it 
-% in step 3 of Section 4C.
+% training set. See fileList_template.mat for an example of how to 
+% structure this array. AccuSleep_train produces a SeriesNetwork object. 
+% Name this variable ‘net’ and save it in a .mat file. You can then load 
+% it in step 3 of Section 4C.
 % 
 % 
 % Section 4C: Automatic labeling
