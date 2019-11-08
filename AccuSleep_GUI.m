@@ -315,7 +315,7 @@ idx = handles.recbox.Value; % get currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 selectedFile = allRecordings{idx}.labelpath; % just get info for current recording
 labels = [];
-if isfile(selectedFile) % if the file exists
+if exist(selectedFile)==2 % if the file exists
     d = load(selectedFile); % load it
     if isfield(d,'labels') % if it has a field called labels
         labels = d.labels; % use them
