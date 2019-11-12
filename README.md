@@ -49,6 +49,7 @@ https://osf.io/py5eb/
 - Statistics and Machine Learning Toolbox
 - Deep Learning Toolbox
 - Signal Processing Toolbox
+- Image Processing Toolbox
 
 ## Functions
 
