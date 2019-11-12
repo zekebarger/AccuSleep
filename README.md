@@ -56,6 +56,7 @@ https://osf.io/py5eb/
     recording equipment
 
 ## Tips & Troubleshooting
+- Make sure the required toolboxes are installed
 - Using more data for calibration will produce better results. However, labeling 
   more than a few minutes of each state probably isn't necessary.
 - If you create a calibration file using one recording, then use it to score another
