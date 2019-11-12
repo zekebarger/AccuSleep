@@ -41,6 +41,7 @@ https://osf.io/py5eb/
 ## Requirements
 - MATLAB version 2017b or later
 - Statistics and Machine Learning Toolbox
+- Deep Learning Toolbox
 
 ## Functions
 
