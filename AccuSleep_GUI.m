@@ -1,8 +1,35 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger 110519
+% Zeke Barger 11/11/19
 % To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
+
+% First, check that all required toolboxes are installed, and that MATLAB 
+% is at least version 2017b
+toolboxes = {'nnet','stats','signal','images'};
+installed = zeros(1,5);
+for i = 1:4
+    if ~isempty(ver(toolboxes{i}))
+        installed(i) = 1;
+    end
+end
+if ~verLessThan('matlab','9.3')
+    installed(5) = 1;
+end
+if ~all(installed) % something needs to be installed
+    tboxNames = {'Deep Learning','Statistics and Machine Learning',...
+        'Signal Processing','Image Processing'};
+    msg ='%sError: the following updates are required:';
+    for i = 1:4
+        if ~installed(i)
+            msg = [msg,'\nInstall the ',tboxNames{i},' Toolbox'];
+        end
+    end
+    if ~installed(5)
+        msg = [msg,'\nUpdate to MATLAB 2017b or later'];
+    end
+    error(msg,'')
+end
 
 
 % Begin initialization code - do not edit
