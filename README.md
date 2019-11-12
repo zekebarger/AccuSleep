@@ -19,14 +19,20 @@ Please contact zeke (at) berkeley (dot) edu with any questions or comments about
 
 ## Installation instructions
 
-Save the MATLAB package somewhere on your computer, then add it
-to your MATLAB path. You can do this in the MATLAB "Current Folder"
+1. Make sure your version of MATLAB meets the specifications in the
+"Requirements" section below.
+
+2. Click the "Clone or download" button.
+
+3. Extract the contents of the zip file.
+
+4. Add AccuSleep to your MATLAB path. You can do this in the MATLAB "Current Folder"
 window by right-clicking the AccuSleep folder, clicking "Add to Path"
 --> "Selected Folders and Subfolders", then running the command
 `savepath`
 in the Command Window.
 
-To get started, run `AccuSleep_GUI` and click the Help button, or run
+To get started, run `AccuSleep_GUI` and click the "User manual" button, or run
 `doc AccuSleep_instructions`
 for a full explanation of these functions and the types of input
 they require.
@@ -56,7 +62,7 @@ https://osf.io/py5eb/
     recording equipment
 
 ## Tips & Troubleshooting
-- Make sure the required toolboxes are installed
+- Make sure the required toolboxes are installed.
 - Using more data for calibration will produce better results. However, labeling 
   more than a few minutes of each state probably isn't necessary.
 - If you create a calibration file using one recording, then use it to score another
