@@ -80,7 +80,7 @@ https://osf.io/py5eb/
 - Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
 ## Screenshots
-![alt test](https://i.imgur.com/zeoqlfP.png)
+![alt test](https://i.imgur.com/tpS6FN4.png)
 Primary interface (AccuSleep_GUI)
 
 ![alt test](https://i.imgur.com/hFZXLev.png)
