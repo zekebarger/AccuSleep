@@ -104,6 +104,20 @@ text(handles.axes1,.51,.496,'AccuSleep','FontSize',43,'Rotation',90,'Color',[.68
     'HorizontalAlignment','center')
 text(handles.axes1,.49,.504,'AccuSleep','FontSize',43,'Rotation',90,'Color',[.17 .26 .62],...
     'HorizontalAlignment','center')
+    
+% clear all fields
+set(handles.recbox,'String',{'Recording 1'});
+set(handles.recbox,'Value',1);
+set(handles.srBox,'String','');
+set(handles.tsBox,'String','');
+set(handles.eegTxt,'String','');
+set(handles.emgTxt,'String','');
+set(handles.outputTxt,'String','');
+set(handles.calibTxt,'String','');
+set(handles.netTxt,'String','');
+set(handles.boutBox,'String','5');
+set(handles.overwriteBox,'Value',0);
+set(handles.console,'String',{})
 
 % --- Outputs from this function are returned to the command line.
 function varargout = AccuSleep_GUI_OutputFcn(hObject, eventdata, handles)
