@@ -6,7 +6,7 @@ function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepa
 %   EMG: the EMG signal as a vector
 %   SR: the sampling rate for the EEG and EMG in Hz
 %   epochLen: the desired epoch length for sleep stage labels, in seconds.
-%             Values below 2.5 are not supported, and values aboe 5 are not
+%             Values below 2.5 are not supported, and values above 5 are not
 %             recommended.
 %   labels (optional): a vector of sleep stage labels. The length
 %             must match the number of epochs in the EEG/EMG signal.
