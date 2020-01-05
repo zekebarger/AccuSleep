@@ -1,6 +1,6 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger 11/11/19
+% Zeke Barger, Jan 05 2020
 % To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
 
@@ -139,7 +139,7 @@ if ~ischar(file) % if nothing was selected, return
     return
 end
 
-setListLock(handles,1); % lock list so that inputs don't change while this runs
+lockInputs(handles,1); % lock inputs so they can't be changed at this time
 
 idx = handles.recbox.Value; % get index of currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
@@ -151,16 +151,7 @@ rec.EEGpath = '';
 setIndicator(getappdata(handles.D,'eegIndicators'), 'working')
 drawnow;
 
-fileContents = whos('-file',[path,file]); % get information about file contents
-EEGvar = []; % just keep info about the EEG variable (if it exists)
-% look for a variable named 'EEG'
-for i = 1:length(fileContents)
-    if strcmp('EEG',fileContents(i).name)
-        EEGvar = fileContents(i);
-        break
-    end
-end
-
+EEGvar = whos('-file',[path,file],'EEG'); % get info about the EEG variable
 if ~isempty(EEGvar) % if we found a variable named 'EEG'
     % check that it's the right shape, and is numeric
     numericClasses = {'int8', 'uint8', 'int16', 'uint16', ...
@@ -173,7 +164,7 @@ if ~isempty(EEGvar) % if we found a variable named 'EEG'
         rec.indicators{1} = 'failure';
         allRecordings{idx}=rec;
         setappdata(handles.D,'recordings',allRecordings);
-        setListLock(handles,0); % unlock the list box
+        lockInputs(handles,0); % unlock the inputs
         updateDisplay(handles); % update the display
         return
     end
@@ -200,7 +191,7 @@ else
 end
 allRecordings{idx}=rec; % store new EEG data
 setappdata(handles.D,'recordings',allRecordings);
-setListLock(handles,0); % unlock the list
+lockInputs(handles,0); % unlock the inputs
 updateDisplay(handles); % update the display
 
 % selects EMG data file
@@ -218,7 +209,7 @@ if ~ischar(file)
     return
 end
 
-setListLock(handles,1); % lock list
+lockInputs(handles,1); 
 idx = handles.recbox.Value; % get currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 rec = allRecordings{idx}; % just get info for current recording
@@ -229,16 +220,7 @@ rec.EMGpath = '';
 setIndicator(getappdata(handles.D,'emgIndicators'), 'working')
 drawnow;
 
-fileContents = whos('-file',[path,file]); % get information about file contents
-EMGvar = []; % just keep info about the EMG variable (if it exists)
-% look for a variable named 'EMG'
-for i = 1:length(fileContents)
-    if strcmp('EMG',fileContents(i).name)
-        EMGvar = fileContents(i);
-        break
-    end
-end
-
+EMGvar = whos('-file',[path,file],'EMG'); % get information about file contents
 if ~isempty(EMGvar) % if we found a variable named 'EMG'
     % check that it's the right shape, and is numeric
     numericClasses = {'int8', 'uint8', 'int16', 'uint16', ...
@@ -251,7 +233,7 @@ if ~isempty(EMGvar) % if we found a variable named 'EMG'
         rec.indicators{2} = 'failure';
         allRecordings{idx}=rec;
         setappdata(handles.D,'recordings',allRecordings);
-        setListLock(handles,0); % unlock the list box
+        lockInputs(handles,0); % unlock the inputs
         updateDisplay(handles); % update the display
         return
     end
@@ -277,7 +259,7 @@ else
 end
 allRecordings{idx}=rec;
 setappdata(handles.D,'recordings',allRecordings);
-setListLock(handles,0);
+lockInputs(handles,0);
 updateDisplay(handles); % update the display
 
 function outputBtn_Callback(hObject, eventdata, handles) % sets location of output file
@@ -305,7 +287,7 @@ if ~ischar(file) % user did not give input
     return
 end
 
-setListLock(handles,1); % lock the list box
+lockInputs(handles,1); % lock the inputs
 
 idx = handles.recbox.Value; % get currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
@@ -336,7 +318,7 @@ end
 
 allRecordings{idx}=rec; % store the loaded labels
 setappdata(handles.D,'recordings',allRecordings);
-setListLock(handles,0); % unlock the list box
+lockInputs(handles,0); % unlock the inputs
 updateDisplay(handles);
 
 
@@ -348,7 +330,7 @@ if checkMissingEntries(handles, 0,0)
 end
 
 disptext(handles, 'Working...');
-setListLock(handles,1);
+lockInputs(handles,1);
 drawnow;
 
 % check if a label file already exists, and load those labels if possible
@@ -357,7 +339,7 @@ allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
 selectedFile = allRecordings{idx}.labelpath; % just get info for current recording
 labels = [];
 if exist(selectedFile)==2 % if the file exists
-    d = load(selectedFile); % load it
+    d = load(selectedFile, 'labels'); % load it
     if isfield(d,'labels') % if it has a field called labels
         labels = d.labels; % use them
     end
@@ -379,7 +361,7 @@ disptext(handles, message);
 
 % complete animation
 animateBoxes([ind{1}(2), ind{2}(2),ind{3}(2),ind{4}(2),ind{5}(2)], 2, codes);
-setListLock(handles,0); % unlock list box
+lockInputs(handles,0); 
 
 
 % sets calibration file path
@@ -392,7 +374,7 @@ if ischar(file) % if something was selected
     setappdata(handles.D,'calibrationData',[]);
     setIndicator(getappdata(handles.D,'calibIndicators'), 'working')
     drawnow;
-    d = load([path,file]); % load the file
+    d = load([path,file], 'calibrationData'); % load the file
     if isfield(d,'calibrationData') % if it has the field we need
         setappdata(handles.D,'calibrationData',d.calibrationData); % store new data
         set(handles.calibTxt,'String',[path,file]);
@@ -416,7 +398,7 @@ if ischar(file)
     setappdata(handles.D,'net',[]);
     setIndicator(getappdata(handles.D,'netIndicators'), 'working')
     drawnow;
-    d = load([path,file]);
+    d = load([path,file], 'net');
     if isfield(d,'net')
         setappdata(handles.D,'net',d.net);
         set(handles.netTxt,'String',[path,file]);
@@ -429,7 +411,7 @@ if ischar(file)
 end
 
 function createBtn_Callback(hObject, eventdata, handles) % creates a calibration data file
-setListLock(handles,1); % lock the list box
+lockInputs(handles,1); % lock the inputs
 
 idx = handles.recbox.Value; % get currently selected recording
 allRecordings = getappdata(handles.D,'recordings'); % get all the recordings
@@ -437,7 +419,7 @@ rec = allRecordings{idx}; % the currently considered recording
 
 % make sure we have the files we need
 if checkMissingEntries(handles, 0, 0)
-    setListLock(handles,0); % unlock list box
+    lockInputs(handles,0); 
     return
 end
 
@@ -446,18 +428,18 @@ if exist(rec.labelpath)~=2
     animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles,...
         'ERROR: Sleep stage label file does not exist, see Section 4 of the user manual');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 
 % check if it has the correct contents
-d = load(rec.labelpath); % load label file
+d = load(rec.labelpath, 'labels'); % load label file
 if isfield(d,'labels') % if it has a field called labels
     labels = d.labels; % get the labels
 else
     animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: Sleep stage label file must have a variable called "labels"');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 % check if all labels are outside the range 1:3
@@ -465,7 +447,7 @@ if all(labels > 3 | labels < 1)
     animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: At least some labels must be in the range 1:3.');
     disptext(handles, '       See Section 4 of the user manual.');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 % check if there are at least a few labels for each state
@@ -473,7 +455,7 @@ if ~all([sum(labels==1)>=3, sum(labels==2)>=3, sum(labels==3)>=3])
     animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: At least some epochs of each stage must be labeled.');
     disptext(handles, '       Click the user manual button for details.');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 % check if we have a reasonable number of labels
@@ -482,14 +464,14 @@ if sum(labels <= 3 | labels >= 1) * ts / 60 < 5
     disptext(handles, 'WARNING: At least 5 minutes of labeled data are recommended for');
     disptext(handles, '         creating a calibration data file');
     disptext(handles, '         Click the user manual button for details.');
-    setListLock(handles,0);
+    lockInputs(handles,0);
 end
 
 if rec.EEGlen ~= rec.EMGlen % check EEG and EMG are the same length
     animateBoxes([getappdata(handles.D,'eegIndicators'),...
         getappdata(handles.D,'eegIndicators')],0);
     disptext(handles, 'ERROR: EEG and EMG must be the same length');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 
@@ -517,7 +499,7 @@ if isempty(calibrationData)
     animateBoxes(getappdata(handles.D,'outputIndicators'),0);
     disptext(handles, 'ERROR: Length of label file does not match length');
     disptext(handles, '       of EEG/EMG. Check the SR or epoch size?');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 
@@ -525,7 +507,7 @@ end
 [file,path] = uiputfile('*.mat','Set filename for calibration data file');
 if ~ischar(file) % if no file given
     disptext(handles, 'ERROR: No filename chosen');
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 
@@ -539,16 +521,16 @@ setappdata(handles.D,'calibrationData', calibrationData);
 % insert filename into text box
 set(handles.calibTxt,'String', [path,file]);
 setIndicator(getappdata(handles.D,'calibIndicators'), 'success')
-setListLock(handles,0);
+lockInputs(handles,0);
 
 
 % classify sleep stages automatically
 function runBtn_Callback(hObject, eventdata, handles) 
-setListLock(handles,1); % lock the list box
+lockInputs(handles,1); % lock the inputs
 
 % check that all boxes are filled
 if checkMissingEntries(handles, 1, 1)
-    setListLock(handles,0);
+    lockInputs(handles,0);
     return
 end
 
@@ -604,7 +586,7 @@ for i = 1:length(allRecordings)
         disptext(handles, '       No files have been changed. See command window for details');
         animateBoxes([ind{1}(4),...
             ind{2}(4),ind{3}(4),ind{4}(4),ind{5}(4), ind{6}(2), ind{7}(2)], 0);
-        setListLock(handles,0);
+        lockInputs(handles,0);
         return
     end
 end
@@ -616,7 +598,7 @@ animateBoxes([ind{1}(4),...
 for i = 1:length(allRecordings)
     % if we need to keep existing labels...
     if get(handles.overwriteBox,'Value') && exist(allRecordings{i}.labelpath, 'file')
-        d = load(allRecordings{i}.labelpath); % load the labels
+        d = load(allRecordings{i}.labelpath, 'labels'); % load the labels
         if isfield(d, 'labels')
             userLabels = d.labels;
             userLabels(userLabels < 1) = 0; % discard undefined states
@@ -658,7 +640,7 @@ for i = 1:length(allRecordings)
     save(allRecordings{i}.labelpath, 'labels'); 
 end
 disptext(handles, 'Finished scoring recordings.'); 
-setListLock(handles,0); % unlock list box
+lockInputs(handles,0); 
 
 
 % check if anything is missing before classification
@@ -1015,10 +997,19 @@ if strcmp(rec.indicators{3},'success')
     setIndicator(ind(3), 'unknown')
 end
 
-% lock the list box while the program is busy (1), or unlock it (0)
-function [] = setListLock(handles,locked)
+% lock input fields while the program is busy (1), or unlock them (0)
+function [] = lockInputs(handles,locked)
+handlesToLock = {handles.recbox, handles.addrecbtn, handles.removerecbtn,...
+    handles.srBox, handles.tsBox, handles.eegBtn, handles.emgBtn,...
+    handles.outputBtn, handles.manualBtn, handles.createBtn,...
+    handles.calibBtn, handles.netFile, handles.runBtn,...
+    handles.overwriteBox, handles.boutBox};
 if locked
-    set(handles.recbox,'Enable','off');
+    for i = 1:length(handlesToLock)
+        set(handlesToLock{i},'Enable','off');
+    end
 else
-    set(handles.recbox,'Enable','on');
+    for i = 1:length(handlesToLock)
+        set(handlesToLock{i},'Enable','on');
+    end
 end
