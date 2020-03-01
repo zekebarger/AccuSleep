@@ -229,7 +229,7 @@ disp('Training network')
 [net, trainInfo] = trainNetwork(imdsTrain,layers,options);
 
 disp('Training complete: Final validation accuracy:')
-disp([trainInfo.ValidationAccuracy(end),'%'])
+disp([num2str(trainInfo.ValidationAccuracy(end)),'%'])
 
 % delete the images
 if deleteImages
