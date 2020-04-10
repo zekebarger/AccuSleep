@@ -1,6 +1,8 @@
 # AccuSleep
 
 ## Updates
+**04/09/2020** - Implemented a better algorithm for removing short bouts.
+
 **11/05/2019** - EEG/EMG data are now only loaded when necessary to avoid out-of-memory errors.
     **Please replace any older versions of AccuSleep with this one.**
     
