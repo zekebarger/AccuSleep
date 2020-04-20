@@ -1,6 +1,6 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger, Jan 05 2020
+% Zeke Barger, Apr 20 2020
 % To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
 
