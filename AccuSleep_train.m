@@ -1,6 +1,6 @@
 function [net] = AccuSleep_train(fileList, SR, epochLen, epochs, imageLocation)
 % AccuSleep_train  Train a network for classifying brain states
-% Zeke Barger 100119
+% Zeke Barger, Apr 20 2020
 %
 %   Arguments:
 %   fileList - a cell array with three columns. Each entry is the path to a
@@ -33,7 +33,7 @@ switch nargin
     case {0, 1, 2, 3}
         error('Not enough arguments')
     case 4
-        imageLocation = [char(cd),'\trainingImages_',...    
+        imageLocation = [char(cd),'\training_images_',...    
             char(datetime(now,'ConvertFrom','datenum',...
             'Format','yyyy-MM-dd_HH-mm-ss'))];
         deleteImages = 1;
@@ -47,17 +47,22 @@ if ~iscell(fileList) || (size(fileList,1) < 1 || size(fileList,2) ~= 3)
         'Type "help AccuSleep_train" for details.'])
 end
 
-% make directory to hold training images?
+% make directory to hold training images
 % remove slash at the end of the path if it's there already
 if strcmp(imageLocation(end),'\') || strcmp(imageLocation(end),'/')
     imageLocation = imageLocation(1:end-1);
 end
+% put a folder inside the target location
+imageLocation = [imageLocation,'\training_images_',...    
+            char(datetime(now,'ConvertFrom','datenum',...
+            'Format','yyyy-MM-dd_HH-mm-ss'))];
 mkdir(imageLocation);
+% make folders for each class
 for i = 1:3
     mkdir([imageLocation,'\',num2str(i)])
 end
 
-% calculate how many time bins on either side of central bin to include in
+% calculate how many epochs on either side of central epoch to include in
 % the images
 pad = round((epochs - 1) / 2);
 
@@ -93,7 +98,7 @@ for i = 1:nFiles
     s = s(:, [1:(f20idx-1), f20idx:2:f50idx]);
     % take log of the spectrogram
     s = log(s);
-    % calculate log rms for each EMG bin
+    % calculate log rms EMG for each epoch
     processedEMG = processEMG(data.b.EMG, SR, epochLen);
     % make sure labels are the right length
     if length(data.c.labels) > length(processedEMG)
@@ -136,7 +141,7 @@ for i = 1:nFiles
     im(im > 1)=1;
     % generate the images
     disp(['Creating images for recording ',num2str(i)])
-    % take all datapoints with sufficient bins on either side
+    % take all datapoints with sufficient epochs on either side
     for j = (pad+1):(length(processedEMG)-pad)
         % only take timepoints with labels in range 1:3
         if data.c.labels(j) > 0 && data.c.labels(j) < 4
@@ -151,6 +156,7 @@ for i = 1:nFiles
 end
 
 %% Oversample training data to achieve balanced classes
+disp('Balancing classes')
 % count examples of each class
 counts = [0 0 0];
 for i = 1:3
@@ -240,7 +246,7 @@ end
 
 % make sure each set of eeg, emg, and label files looks correct
 % offer the option to skip or quit on encountering a problem
-function [looksGood] = checkFiles(data, SR, binWidth, i)
+function [looksGood] = checkFiles(data, SR, epoch_length, i)
 looksGood = 1;
 
 % need to have all the correct variables
@@ -269,7 +275,7 @@ if ~any(data.c.labels > 0 & data.c.labels < 4)
     return
 end
 % labels must be approximately the same length as EEG / EMG
-if abs(length(data.c.labels)*binWidth*SR - length(data.a.EEG)) / length(data.a.EEG) > 0.05
+if abs(length(data.c.labels)*epoch_length*SR - length(data.a.EEG)) / length(data.a.EEG) > 0.05
     looksGood = showError(['Recording ',num2str(i),' has EEG and label files of different lengths. ']);
     return
 end
