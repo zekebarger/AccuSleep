@@ -15,7 +15,7 @@
 
 AccuSleep is a set of graphical user interfaces for scoring rodent
 sleep using EEG and EMG recordings. To learn more about the algorithms used
-by this software, please see our publication here: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0224642
+by this software, please see our [publication](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0224642).
 
 Please contact zeke (at) berkeley (dot) edu with any questions or comments about the software.
 
@@ -79,6 +79,10 @@ https://osf.io/py5eb/
   this software.
 - If your recordings are very long (>48 hours) and are not displaying properly, try splitting
   them into smaller files.
+- Ensure the epoch length associated with the labels, calibration data, and trained network 
+  are the same.
+- Networks trained using MATLAB 2019a or later do not seem to be backward compatible with earlier
+  versions of MATLAB. However, networks trained on 2018b or earlier seem to be forward compatible.
 - Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
 ## Screenshots
