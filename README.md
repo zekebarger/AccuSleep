@@ -14,8 +14,9 @@
 ## Description
 
 AccuSleep is a set of graphical user interfaces for scoring rodent
-sleep using EEG and EMG recordings. To learn more about the algorithms used
-by this software, please see our [publication](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0224642).
+sleep using EEG and EMG recordings. If you use AccuSleep in your research, please cite our [publication](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0224642):
+
+Barger, Z., Frye, C. G., Liu, D., Dan, Y., & Bouchard, K. E. (2019). Robust, automated sleep scoring by a compact neural network with distributional shift correction. *PLOS ONE, 14*(12), 1–18.
 
 Please contact zeke (at) berkeley (dot) edu with any questions or comments about the software.
 
