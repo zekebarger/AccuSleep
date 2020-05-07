@@ -24,7 +24,7 @@ Please contact zeke (at) berkeley (dot) edu with any questions or comments about
 1. Make sure your version of MATLAB meets the specifications in the
 "Requirements" section below.
 
-2. Click the "Clone or download" button.
+2. Click the "Clone or download" button and choose "Download ZIP".
 
 3. Extract the contents of the zip file.
 
