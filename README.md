@@ -18,6 +18,8 @@ sleep using EEG and EMG recordings. If you use AccuSleep in your research, pleas
 
 Barger, Z., Frye, C. G., Liu, D., Dan, Y., & Bouchard, K. E. (2019). Robust, automated sleep scoring by a compact neural network with distributional shift correction. *PLOS ONE, 14*(12), 1–18.
 
+The data used for training and testing AccuSleep are available at https://osf.io/py5eb/
+
 Please contact zeke (at) berkeley (dot) edu with any questions or comments about the software.
 
 ## Installation instructions
@@ -43,9 +45,6 @@ they require.
 **`AccuSleep_GUI`** provides an interface for most of the functions
 in this package, but if you want to batch process recordings from multiple subjects, you can
 call the required functions yourself.
-
-To download the data used for training and testing AccuSleep, please visit
-https://osf.io/py5eb/
 
 ## Requirements
 - MATLAB version 2017b or later
