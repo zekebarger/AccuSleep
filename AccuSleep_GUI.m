@@ -1,6 +1,6 @@
 function varargout = AccuSleep_GUI(varargin)
 % AccuSleep_GUI A GUI for classifying rodent sleep stages
-% Zeke Barger, Apr 20 2020
+% Zeke Barger, 081120
 % To see the user manual, run this code and press the user manual button, or run:
 % doc AccuSleep_instructions
 
@@ -896,7 +896,7 @@ drawnow;
 
 % from filename, get containing directory
 function [d] = getDir(f)
-s = strfind(f,'\');
+s = strfind(f,filesep);
 d = f(1:s(end));
 
 
