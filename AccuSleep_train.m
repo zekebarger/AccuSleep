@@ -1,6 +1,6 @@
 function [net] = AccuSleep_train(fileList, SR, epochLen, epochs, imageLocation)
 % AccuSleep_train  Train a network for classifying brain states
-% Zeke Barger, Apr 20 2020
+% Zeke Barger, 081120
 %
 %   Arguments:
 %   fileList - a cell array with three columns. Each entry is the path to a
@@ -33,7 +33,7 @@ switch nargin
     case {0, 1, 2, 3}
         error('Not enough arguments')
     case 4
-        imageLocation = [char(cd),'\training_images_',...    
+        imageLocation = [char(cd),filesep,'training_images_',...    
             char(datetime(now,'ConvertFrom','datenum',...
             'Format','yyyy-MM-dd_HH-mm-ss'))];
         deleteImages = 1;
@@ -53,13 +53,13 @@ if strcmp(imageLocation(end),'\') || strcmp(imageLocation(end),'/')
     imageLocation = imageLocation(1:end-1);
 end
 % put a folder inside the target location
-imageLocation = [imageLocation,'\training_images_',...    
+imageLocation = [imageLocation,filesep,'training_images_',...    
             char(datetime(now,'ConvertFrom','datenum',...
             'Format','yyyy-MM-dd_HH-mm-ss'))];
 mkdir(imageLocation);
 % make folders for each class
 for i = 1:3
-    mkdir([imageLocation,'\',num2str(i)])
+    mkdir([imageLocation,filesep,num2str(i)])
 end
 
 % calculate how many epochs on either side of central epoch to include in
@@ -147,8 +147,8 @@ for i = 1:nFiles
         if data.c.labels(j) > 0 && data.c.labels(j) < 4
             thisImg = im((j-pad):(j+pad),:);
             % create filename
-            fName = [imageLocation,'\',num2str(data.c.labels(j)),...
-                '\rec',num2str(i),'t',num2str(j-pad,'%05.f'),'.png'];
+            fName = [imageLocation,filesep,num2str(data.c.labels(j)),...
+                filesep,'rec',num2str(i),'t',num2str(j-pad,'%05.f'),'.png'];
             % write to file
             imwrite(thisImg, fName);
         end
@@ -160,7 +160,7 @@ disp('Balancing classes')
 % count examples of each class
 counts = [0 0 0];
 for i = 1:3
-    d = dir([imageLocation,'\',num2str(i)]);
+    d = dir([imageLocation,filesep,num2str(i)]);
     counts(i) = length(d)-2;
 end
 
@@ -168,10 +168,10 @@ end
 for i = 1:3
    if counts(i) < max(counts)
       numSamples = max(counts) - counts(i);
-      d = dir([imageLocation,'\',num2str(i)]);
+      d = dir([imageLocation,filesep,num2str(i)]);
       for j = 1:numSamples
           k = ceil(rand*counts(i))+2;
-          copyfile([d(k).folder,'\',d(k).name], [d(k).folder,'\',num2str(j),'__',d(k).name,'.png']);
+          copyfile([d(k).folder,filesep,d(k).name], [d(k).folder,filesep,num2str(j),'__',d(k).name,'.png']);
           
       end
    end
