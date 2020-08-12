@@ -1,6 +1,8 @@
 # AccuSleep
 
 ## Updates
+**08/11/2020** - **Mac compatibility.** AccuSleep should now be functional on Mac computers.
+
 **04/09/2020** - Implemented a better algorithm for removing short bouts.
 
 **11/05/2019** - EEG/EMG data are now only loaded when necessary to avoid out-of-memory errors.
