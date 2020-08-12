@@ -1,6 +1,6 @@
 function [labels] = AccuSleep_classify(EEG, EMG, net, SR, epochLen, calibrationData, minBoutLen)
 % AccuSleep_classify  Classify brain states
-% Zeke Barger 062519
+% Zeke Barger 081120
 %
 %   Arguments: (note that these are data, not paths to files)
 %   EEG - a 1-D matrix of EEG data
@@ -77,6 +77,11 @@ end
 % classify
 X = uint8(X.*255);
 labels = double(classify(net,X))';
+
+% put labels in correct orientation
+if isrow(labels)
+    labels = labels';
+end
 
 % remove bouts that are too short
 if minBoutLen > epochLen
