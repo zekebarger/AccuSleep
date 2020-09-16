@@ -85,6 +85,7 @@ call the required functions yourself.
   are the same.
 - Networks trained using MATLAB 2019a or later do not seem to be backward compatible with earlier
   versions of MATLAB. However, networks trained on 2018b or earlier seem to be forward compatible.
+- Make sure the recordings are free of NaN and Inf values.
 - Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
 ## Screenshots
