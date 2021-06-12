@@ -1,7 +1,9 @@
 # AccuSleep
 
 ## Updates
-**08/11/2020** - **Mac compatibility.** AccuSleep should now be functional on Mac computers.
+**06/12/2021** - Support for scoring more than three brain states is now available with [AccuSleep X](https://github.com/zekebarger/AccuSleep_X).
+
+**08/11/2020** - Mac compatibility. AccuSleep should now be functional on Mac computers.
 
 **04/09/2020** - Implemented a better algorithm for removing short bouts.
 
