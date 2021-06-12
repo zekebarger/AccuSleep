@@ -124,7 +124,7 @@ function AccuSleep_instructions
 %    least several minutes of each stage, and more labels will improve 
 %    classification accuracy. If the label file already meets this 
 %    condition, continue to step 3. Otherwise, click 
-%    'core selected manually', assign some sleep stage labels to the 
+%    'score selected manually', assign some sleep stage labels to the 
 %    recording, and save the labels. 
 % 
 % 3. Click 'Create calibration data file'.
@@ -155,7 +155,7 @@ function AccuSleep_instructions
 %    each recording from one subject. Since each subject requires its
 %    own calibration file, only recordings from one subject can be 
 %    scored at a time. If the recording conditions are different in
-%    some recordings (e.g., a different amplified was used), remove 
+%    some recordings (e.g., a different amplifier was used), remove 
 %    these recordings from the recording list and process them 
 %    separately with their own calibration file.
 % 
