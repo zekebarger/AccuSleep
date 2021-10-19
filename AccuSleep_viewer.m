@@ -10,7 +10,7 @@ function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepa
 %             recommended.
 %   labels (optional): a vector of sleep stage labels. The length
 %             must match the number of epochs in the EEG/EMG signal.
-%             1 = REM, 2 = wake, 3 = NREM, 4 = undefined
+%             1 = REM, 2 = wake, 3 = NREM, 7 = undefined
 %   savepath (optional): a filename for saving the sleep stage labels.
 %             AccuSleep_GUI uses this argument, but if you are calling this
 %             function yourself, you can probably ignore it.
@@ -22,7 +22,7 @@ function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepa
 %
 %   Likewise, labels can be loaded from a .mat file as long as it contains
 %   a variable called 'labels' that is a vector with the same number of
-%   epochs as the EEG/EMG signals and values ranging from 1 to 4.
+%   epochs as the EEG/EMG signals and values ranging from 1 to 7.
 
 %% Check the inputs
 G = struct; % holds everything
@@ -79,7 +79,7 @@ G.cappedEMG(G.cappedEMG > emgCap) = emgCap;
 G.show = 5; %  default number of bins to display on screen
 G.dt = 1/G.originalSR; % duration of each EEG/EMG sample in seconds
 G.advance = 0; % whether to advance automatically when a state is assigned
-G.colors = [1 1 1; .47 .67 .19; .14 .2 .57; 0.996 0.758 0.039; 0 0 0]; %colors for sleep stages
+G.colors = [1 1 1; .47 .67 .19; .14 .2 .57; 0.996 0.758 0.039; .7 .96 .82; .85 .325 .098; .301 .745 .933; 0 0 0]; %colors for sleep stages
 G.mid = ceil(G.show/2); % important for plotting the current time marker - middle of G.show
 G.savepath = ''; % where to save the sleep stage labels
 G.nbins = length(tAxis); % total number of time bins in the recording
@@ -233,30 +233,31 @@ G.rangebtn = uicontrol(WIN,'Style','pushbutton','Units','normalized','Background
     'FontSize',9,'ToolTip',sprintf(['Set state for range of timepoints (*)',...
     '\nDraw an ROI on the upper sleep stage panel,\nand double-click it']));
 G.nrembtn = uicontrol(WIN,'Style','pushbutton', 'Units','normalized',...
-    'Position',[.93 .13 .062 .025],'String','NREM','Callback',@(src,evnt)setState(src,evnt,3),...
+    'Position',[.93 .16 .062 .025],'String','NREM','Callback',@(src,evnt)setState(src,evnt,3),...
     'FontSize',9,'ToolTip','Set state to NREM (S)','BackgroundColor',[1 .96 .82]); %.8 .8 .8
 G.wakebtn = uicontrol(WIN,'Style','pushbutton', 'Units','normalized',...
-    'Position',[.93 .1 .062 .025],'String','Wake','Callback',@(src,evnt)setState(src,evnt,2),...
+    'Position',[.93 .13 .062 .025],'String','Wake','Callback',@(src,evnt)setState(src,evnt,2),...
     'FontSize',9,'ToolTip','Set state to wake (W)','BackgroundColor',[.86 .88 1]); % .93 .5 .93
 G.rembtn = uicontrol(WIN,'Style','pushbutton', 'Units','normalized',...
-    'Position',[.93 .07 .062 .025],'String','REM','Callback',@(src,evnt)setState(src,evnt,1),...
+    'Position',[.93 .1 .062 .025],'String','REM','Callback',@(src,evnt)setState(src,evnt,1),...
     'FontSize',9,'ToolTip','Set state to REM (R)','BackgroundColor',[.84 .92 .73]); % .5 1 1
 G.autobox = uicontrol(WIN,'Style','checkbox', 'Units','normalized',...
-    'Position',[.93 .005 .062 .06],'String','<html>Auto-<br>scroll','Callback',@scrollCallback,...
+    'Position',[.93 .19 .062 .06],'String','<html>Auto-<br>scroll','Callback',@scrollCallback,...
     'FontSize',9,'ToolTip','Advance to next time step after assigning label (insert)');
 
 
 G.nremabtn = uicontrol(WIN, 'Style', 'pushbutton', 'Units', 'normalized',...
-'Position', [.93, .04, .062, .025],'String','NREM_artifact','Callback',@(src,evnt)setState(src,evnt,4),...
-'FontSize',9,'ToolTip','Set state to NREM_artifact (S*)','BackgroundColor',[1 .96 .82]); %.8 .8 .8
-
-G.remabtn = uicontrol(WIN, 'Style', 'pushbutton', 'Units', 'normalized',...
-'Position', [.93, .01, .062, .025],'String','REM_artifact','Callback',@(src,evnt)setState(src,evnt,5),...
-'FontSize',9,'ToolTip','Set state to REM_artifact (R*)','BackgroundColor',[1 .96 .82]); %.8 .8 .8
+    'Position', [.93, .07, .062, .025],'String','NREM_artifact','Callback',@(src,evnt)setState(src,evnt,4),...
+    'FontSize',9,'ToolTip','Set state to NREM_artifact (I)','BackgroundColor',[.7 .96 .82]); %.8 .8 .8
 
 G.wakeabtn = uicontrol(WIN, 'Style', 'pushbutton', 'Units', 'normalized',...
-'Position', [.93, .01, .062, .025],'String','WAKE_artifact','Callback',@(src,evnt)setState(src,evnt,6),...
-'FontSize',9,'ToolTip','Set state to WAKE_artifact (W*)','BackgroundColor',[1 .96 .82]); %.8 .8 .8
+    'Position', [.93, .04, .062, .025],'String','WAKE_artifact','Callback',@(src,evnt)setState(src,evnt,5),...
+    'FontSize',9,'ToolTip','Set state to WAKE_artifact (O)','BackgroundColor',[.85 .325 .098]); %.8 .8 .8
+
+G.remabtn = uicontrol(WIN, 'Style', 'pushbutton', 'Units', 'normalized',...
+    'Position', [.93, .01, .062, .025],'String','REM_artifact','Callback',@(src,evnt)setState(src,evnt,6),...
+    'FontSize',9,'ToolTip','Set state to REM_artifact (P)','BackgroundColor',[.301 .745 .933]); %.8 .8 .8
+
 
 
 
@@ -322,13 +323,13 @@ message = 'Data loaded successfully';
         cla(G.A7)
         hold(G.A7,'on')
         xlim(G.A7, [-n-0.5 n+0.5]);
-        ylim(G.A7, [0.5 3.5]);
+        ylim(G.A7, [0.5 7.5]);
         set(G.A7, 'XLimMode','manual', 'YLimMode','manual');
         
         for i = 1:length(seq)
-            if seq(i)==4
+            if seq(i)==7
                 pX = [x(i)-.5, x(i)+.5, x(i)+.5, x(i)-.5];
-                pY = [3.5, 3.5, .5, .5];
+                pY = [7.5, 7.5, .5, .5]; % changed: 3.5 3.5
                 patch(G.A7,pX,pY,G.colors(seq(i)+1,:),'EdgeColor','none');
             else
                 pX = [x(i)-.5, x(i)+.5, x(i)+.5, x(i)-.5];
@@ -337,7 +338,7 @@ message = 'Data loaded successfully';
             end
         end
         
-        set(G.A7, 'XTickLabel', [],'XTick',[], 'YTick', [1 2 3], 'YTickLabel', {'REM', 'Wake', 'NREM'});
+        set(G.A7, 'XTickLabel', [],'XTick',[], 'YTick', [1 2 3 4 5 6], 'YTickLabel', {'REM', 'Wake', 'NREM', 'NREM_artifact', 'WAKE_artifact', 'REM_artifact'});
         box(G.A7, 'off');
         
         % plot EEG and EMG
@@ -433,20 +434,20 @@ message = 'Data loaded successfully';
         hold(G.A1, 'on');
         box(G.A1,'on');
         ylim(G.A1,[0 1]);
-        ylim(G.A1,[.5 3.5]);
+        ylim(G.A1,[.5 7.5]);
         xlim(G.A1,li) % make sure x limits are correct
         set(G.A1,'XLimMode','manual','YLimMode','manual');
-        imagesc(G.A1,G.specTh,[1 2 3],makeSleepStageImage(G.labels),[0 4]);
+        imagesc(G.A1,G.specTh,[1 2 3 4 5 6],makeSleepStageImage(G.labels),[0 7]);
         colormap(G.A1,G.colors);
-        set(G.A1, 'XTickLabel', [],'XTick',[], 'YTick', [1 2 3], 'YTickLabel', {'REM', 'Wake', 'NREM'});
+        set(G.A1, 'XTickLabel', [],'XTick',[], 'YTick', [1 2 3 4 5 6], 'YTickLabel', {'REM', 'Wake', 'NREM', 'NREM_artifact','WAKE_artifact', 'REM_artifact'});
     end
 
     function [im] = makeSleepStageImage(state) % create the image to show
         % in the top sleep stage panel
         im = zeros(3,length(state));
-        for i = 1:3
+        for i = 1:6
             im(i,:) = (state==i).*i;
-            im(i,state==4) = 4;
+            im(i,state==7) = 7;
         end
     end
 
@@ -547,13 +548,35 @@ message = 'Data loaded successfully';
                 updateState;
                 updatePlots;
                 advance;
-                
-            case {'x','4','numpad4'} % set to undefined
+
+            case {'i','4','numpad4'} % set to NREM_artifact
                 G.labels(G.index) = 4;
                 G.unsavedChanges = 1;
                 updateState;
                 updatePlots;
                 advance;
+
+            case {'o','5','numpad5'} % set to WAKE_artifact
+                G.labels(G.index) = 5;
+                G.unsavedChanges = 1;
+                updateState;
+                updatePlots;
+                advance;
+
+            case {'p','6','numpad6'} % set to REM_artifact
+                G.labels(G.index) = 6;
+                G.unsavedChanges = 1;
+                updateState;
+                updatePlots;
+                advance;
+            
+            case {'x','7','numpad7'} % set to undefined
+                G.labels(G.index) = 7;
+                G.unsavedChanges = 1;
+                updateState;
+                updatePlots;
+                advance;
+
                 
             case 'f' % save file
                 saveFile();
@@ -580,7 +603,7 @@ message = 'Data loaded successfully';
                 
                 [label,~] = listdlg('PromptString','Set label to:',...
                     'SelectionMode','single',...
-                    'ListString',{'REM', 'Wake','NREM','Undefined'});
+                    'ListString',{'REM', 'Wake','NREM','REM_artifact','WAKE_artifact','NREM_artifact','Undefined'});
                 if isempty(label) % no label selected
                     delete(t);
                     return
@@ -617,7 +640,7 @@ message = 'Data loaded successfully';
 
     function setState(src,~, a) % apply label to single time bin
         evt= struct;
-        keys = {'r','w','s'};
+        keys = {'r','w','s','i','o','p'};
         evt.Key = keys{a};
         keypress([], evt);
         defocus(src);
@@ -755,10 +778,13 @@ message = 'Data loaded successfully';
             '         automatically after applying a label';
             'H : show help menu';
             ' ';
-            'R or 1 : set label as REM (cyan)';
-            'W or 2 : Wake (magenta)';
-            'S or 3 : NREM (gray)';
-            'X or 4 : Undefined (black)';
+            'R or 1 : set label as REM (green)';
+            'W or 2 : Wake (dark blue)';
+            'S or 3 : NREM (yellow)';
+            'I or 4 : NREM artifact (light turquois)';
+            'O or 5 : Wake artifact (red)';
+            'P or 6 : REM artifact (light blue)';
+            'X or 7 : Undefined (black)';
             '* (multiply) : set labels for a range of timepoints.';
             'On the upper sleep stage panel, adjust the ROI to';
             'select the timepoints, then double-click it.';
@@ -821,8 +847,8 @@ message = 'Data loaded successfully';
             msgbox('Error: labels variable must be numeric')
             return
         end
-        if ~isempty(setdiff(unique(x.labels), 1:4)) % in the range 1:4
-            msgbox('Error: labels variable must be in the range 1:4')
+        if ~isempty(setdiff(unique(x.labels), 1:7)) % in the range 1:7
+            msgbox('Error: labels variable must be in the range 1:7')
             return
         end
         if length(size(x.labels)) > 2 || min(size(x.labels)) >  1 % should be a vector
@@ -831,7 +857,7 @@ message = 'Data loaded successfully';
         end
         if checkLen
             
-            if length(x.labels) ~= G.nbins % in the range 1:4
+            if length(x.labels) ~= G.nbins % in the range 1:7
                 msgbox(['Error: labels must be of length ',num2str(G.nbins)])
                 return
             end
