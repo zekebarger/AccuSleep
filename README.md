@@ -94,8 +94,8 @@ call the required functions yourself.
 We would like to thank [Franz Weber](https://www.med.upenn.edu/weberlab/) for creating an early version of the manual labeling interface.
 
 ## Screenshots
-![alt test](https://i.imgur.com/tpS6FN4.png)
 Primary interface (AccuSleep_GUI)
+![alt test](https://i.imgur.com/tpS6FN4.png)
 
-![alt test](https://i.imgur.com/hFZXLev.png)
 Interface for manual sleep scoring (AccuSleep_viewer)
+![alt test](https://i.imgur.com/hFZXLev.png)
