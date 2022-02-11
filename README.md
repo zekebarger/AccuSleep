@@ -90,12 +90,12 @@ call the required functions yourself.
 - Make sure the recordings are free of NaN and Inf values.
 - Please contact zeke (at) berkeley (dot) edu if you find any other issues.
 
+## Acknowledgements
+We would like to thank [Franz Weber](https://www.med.upenn.edu/weberlab/) for creating an early version of the manual labeling interface.
+
 ## Screenshots
 ![alt test](https://i.imgur.com/tpS6FN4.png)
 Primary interface (AccuSleep_GUI)
 
 ![alt test](https://i.imgur.com/hFZXLev.png)
 Interface for manual sleep scoring (AccuSleep_viewer)
-
-## Acknowledgements
-We would like to thank Franz Weber for creating an early version of the manual labeling interface.
