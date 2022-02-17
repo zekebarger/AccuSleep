@@ -8,7 +8,6 @@
 **04/09/2020** - Implemented a better algorithm for removing short bouts.
 
 **11/05/2019** - EEG/EMG data are now only loaded when necessary to avoid out-of-memory errors.
-    **Please replace any older versions of AccuSleep with this one.**
     
 **10/30/2019** - The primary user interface has received a major update, and now
     allows all recordings from one subject to be processed simultaneously. A 
@@ -24,7 +23,7 @@ Barger, Z., Frye, C. G., Liu, D., Dan, Y., & Bouchard, K. E. (2019). Robust, aut
 
 The data used for training and testing AccuSleep are available at https://osf.io/py5eb/
 
-Please contact zeke (at) berkeley (dot) edu with any questions or comments about the software.
+Please contact zekebarger (at) gmail (dot) com with any questions or comments about the software.
 
 ## Installation instructions
 
