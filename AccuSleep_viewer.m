@@ -265,6 +265,7 @@ imagesc(G.A3,G.specTh, fAxis(showFreqs), G.spectrogram',G.caxis1);
 axis(G.A3, 'xy')
 colormap(G.A3,G.colormap);
 G.lims = xlim(G.A3); % store maximum x limits for the upper panel plots
+set(G.A3, 'YTick', 0:5:30, 'YTickLabel', 0:5:30);
 
 % plot processed EMG
 plot(G.A4,G.specTh,G.cappedEMG,'k')
