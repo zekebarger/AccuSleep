@@ -26,6 +26,10 @@ function [message] = AccuSleep_viewer(EEG, EMG, SR, epochLen, userLabels, savepa
 
 %% Check the inputs
 G = struct; % holds everything
+F_welch = figure("Name", "Welch");
+for k = 1:2
+    axes_welch(k) = subplot(2,1,k);
+end
 
 % make sure we have at least 3 arguments
 switch nargin
@@ -131,6 +135,9 @@ catch
     end
 end
 
+
+% Make room to hold theta/delta ratios
+theta_delta = zeros(G.nbins, 1);
 
 
 %% Make the figure window
@@ -373,6 +380,31 @@ message = 'Data loaded successfully';
         G.A6.XTickLabel = xlbl;
         set(G.A6, 'YTick', []);
         
+        % Plot welch
+        % pwelch signal
+        n = round((G.epochLen)/G.dt/2); % number of samples on either side to show
+        i = round(tp / G.dt);
+        ii = i-n:i+n; % choose indices to show
+        st_EEG = standardizeSR(G.EEG(ii), G.originalSR, G.SR);
+        
+        welch_window_sec = G.epochLen;
+        welch_window = welch_window_sec * G.SR;
+        noverlap = welch_window / 2;
+        nfft = G.SR;
+        [pxx,f] = pwelch(st_EEG,hamming(welch_window),noverlap,nfft,G.SR,'psd');
+        subplot(axes_welch(1))
+        plot(axes_welch(1),f,10*log10(pxx))
+        ylabel(axes_welch(1), "10*log10(pxx)")
+        xlabel(axes_welch(1), "Frequency (Hz)")
+        title(axes_welch(1), "Welch's Spectrum")
+        
+        % Calculate theta_delta
+        delta_bands = [1 4];
+        theta_bands = [5 11];
+        theta=trapz(pxx(f >= min(theta_bands) & f <= max(theta_bands)));
+        delta=trapz(pxx(f >= min(delta_bands) & f <= max(delta_bands)));
+        theta_delta(G.index) = theta/delta;
+
         % Plot Progress Button
         tp = G.timepointH; % time in seconds at the center of the screen
         if G.index < G.mid
@@ -386,6 +418,27 @@ message = 'Data loaded successfully';
         hold(G.A2,'on')
         xlim(G.A2,li);
         set(G.A2,'YTick',[],'XTick',[],'XLimMode','manual', 'YLimMode','manual');
+        
+               
+        % Plot theta_delta
+        from = max(1, G.index - 1);
+        to = min(G.index + 1, G.nbins);
+        subplot(axes_welch(2))
+        xlim(axes_welch(2), [G.specTs(from) G.specTs(to)]);
+        yline(axes_welch(2), 1)
+        hold(axes_welch(2), "on")
+        ratio_to_plot = theta_delta(from:to);
+        ratio_to_plot = ratio_to_plot(ratio_to_plot > 0);
+        ratio_to_plot_times = G.specTs(from:to)';
+        ratio_to_plot_times = ratio_to_plot_times(ratio_to_plot > 0);
+        plot(axes_welch(2), ratio_to_plot_times, ratio_to_plot, ...
+            "k-o", 'MarkerFaceColor', 'k')
+        plot(axes_welch(2), G.specTs(G.index), theta_delta(G.index), ...
+            "ro", 'MarkerFaceColor', 'r')
+        hold(axes_welch(2), "off")
+        title(axes_welch(2), "Theta/Delta Ratio")
+        xlabel(axes_welch(2), "Time (sec)")
+
         
         % unless we're at the beginning or end
         if G.index < G.mid  || G.nbins - G.index < (G.mid-1)
