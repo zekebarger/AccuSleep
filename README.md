@@ -45,10 +45,6 @@ To get started, run `AccuSleep_GUI` and click the "User manual" button, or run
 for a full explanation of these functions and the types of input
 they require.
 
-**`AccuSleep_GUI`** provides an interface for most of the functions
-in this package, but if you want to batch process recordings from multiple subjects, you can
-call the required functions yourself.
-
 ## Requirements
 - MATLAB version 2017b or later
 - Statistics and Machine Learning Toolbox
@@ -57,6 +53,10 @@ call the required functions yourself.
 - Image Processing Toolbox
 
 ## Functions
+
+`AccuSleep_GUI` provides an interface for most of the functions
+in this package, but if you want to batch process recordings from multiple subjects, you can
+call the required functions yourself.
 
 - **`AccuSleep_GUI`** A user interface for labeling sleep states, either
     manually or automatically
@@ -87,7 +87,7 @@ call the required functions yourself.
 - Networks trained using MATLAB 2019a or later do not seem to be backward compatible with earlier
   versions of MATLAB. However, networks trained on 2018b or earlier seem to be forward compatible.
 - Make sure the recordings are free of NaN and Inf values.
-- Please contact zeke (at) berkeley (dot) edu if you find any other issues.
+- Please contact zekebarger (at) gmail (dot) edu if you find any other issues.
 
 ## Acknowledgements
 We would like to thank [Franz Weber](https://www.med.upenn.edu/weberlab/) for creating an early version of the manual labeling interface.
