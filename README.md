@@ -1,6 +1,8 @@
 # AccuSleep
 
 ## Updates
+**11/09/2022** - A [video walkthrough](https://www.youtube.com/watch?v=O81qdHlzTbc) is now available.
+
 **06/12/2021** - Support for scoring more than three brain states is now available with [AccuSleep X](https://github.com/zekebarger/AccuSleep_X).
 
 **08/11/2020** - Mac compatibility. AccuSleep should now be functional on Mac computers.
@@ -40,7 +42,7 @@ window by right-clicking the AccuSleep folder, clicking "Add to Path"
 `savepath`
 in the Command Window.
 
-To get started, run `AccuSleep_GUI` and click the "User manual" button, or run
+To get started, run `AccuSleep_GUI` and click the "User manual" button, check out the [video walkthrough](https://www.youtube.com/watch?v=O81qdHlzTbc), or run
 `doc AccuSleep_instructions`
 for a full explanation of these functions and the types of input
 they require.
