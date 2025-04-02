@@ -1,6 +1,9 @@
 # AccuSleep
 
 ## Updates
+**04/02/2025** - A [python version](https://github.com/zekebarger/AccuSleePy) of AccuSleep is now available! Please consider switching to
+this version. It offers several improvements over the original and will be more actively maintained.
+
 **11/09/2022** - A [video walkthrough](https://www.youtube.com/watch?v=O81qdHlzTbc) is now available.
 
 **06/12/2021** - Support for scoring more than three brain states is now available with [AccuSleep X](https://github.com/zekebarger/AccuSleep_X).
