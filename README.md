@@ -32,6 +32,8 @@ Please contact zekebarger (at) gmail (dot) com with any questions or comments ab
 
 ## Installation instructions
 
+0. Consider using the [python version](https://github.com/zekebarger/AccuSleePy) :smile:
+
 1. Make sure your version of MATLAB meets the specifications in the
 "Requirements" section below.
 
